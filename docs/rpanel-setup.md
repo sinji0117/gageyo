@@ -57,6 +57,10 @@ API가 시작될 때 `backend/migrations/`의 SQL migration을 적용합니다. 
 
 **Redis는 현재 gageyo API에서 사용하지 않습니다.** Rpanel에 Redis를 만들거나 연결할 필요가 없습니다. 이후 세션·캐시 기능을 구현할 때 별도로 붙입니다.
 
+### 애플리케이션 로그용 MongoDB
+
+로그 저장소는 MongoDB를 사용할 계획입니다. MongoDB 인스턴스를 준비한 뒤 API 앱 환경 변수에 연결 문자열 `MONGODB_URI`를 등록할 수 있도록 구성하세요. 단, 현재 Rust API의 `tracing` 로그는 표준 출력으로만 기록되며 MongoDB 저장 계층은 아직 연결되지 않았습니다. MongoDB에 실제 로그를 저장하려면 후속으로 API의 MongoDB 연결과 tracing 저장 계층 구현이 필요합니다. 기존 Rpanel 배포 로그도 함께 확인할 수 있도록 유지하세요.
+
 ## 5. GitHub 비공개 저장소 접근 설정
 
 `gageyo`가 비공개 저장소라면 HTTPS URL 대신 SSH 주소를 사용합니다.
