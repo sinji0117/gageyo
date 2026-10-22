@@ -81,7 +81,7 @@ API가 시작될 때 `backend/migrations/`의 SQL migration을 적용합니다. 
 
 | 화면 | 화면 용도 | 앱 폴더 (Root Directory) | 빌드 명령 | 출력 폴더 | 도메인 예시 |
 |---|---|---|---|---|---|
-| 고객 서비스 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/site` | `apps/site/dist` | `app.gageyo.com` |
+| 파트너 탐색·고객 서비스 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/site` | `apps/site/dist` | `app.gageyo.com` |
 | 업체 센터 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/console` | `apps/console/dist` | `partner.gageyo.com` |
 | 운영자 화면 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/admin` | `apps/admin/dist` | `admin.gageyo.com` |
 | 마케팅 소개 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/www` | `apps/www/dist` | `gageyo.com` |
@@ -105,6 +105,8 @@ Rpanel은 `frontend/package.json`을 기준으로 의존성을 설치합니다. 
 4. 고객 화면에서 업체 목록과 `/api/health` 응답을 확인합니다.
 
 프런트엔드 앱은 API와 같은 origin으로 요청하므로 별도의 `VITE_API_URL` 환경 변수가 필요하지 않습니다. 로컬 Vite 개발 서버는 `frontend/apps/site/vite.config.js` 및 `frontend/apps/admin/vite.config.js`가 `/api`를 `127.0.0.1:8081`로 프록시합니다. 고객 화면의 카테고리는 API에서 활성 카테고리를 불러오며, 초기 항목은 DB migration에서 등록됩니다.
+
+운영자 API에서 승인된 업체의 **파트너 키 발급/재발급**을 누르면 키가 한 번 표시됩니다. 이 키를 해당 업체 담당자에게 안전한 채널로 전달하면 `partner.gageyo.com`에서 로그인할 수 있습니다. 키는 업체 하나에 연결되며 DB에는 해시로 저장됩니다. 재발급하면 이전 키는 즉시 무효화됩니다. 운영자 API를 사용하려면 백엔드 앱 환경변수에 `ADMIN_API_KEY`를 강한 임의 값으로 설정하고 운영자 화면에서 같은 값을 입력합니다.
 
 ## 8. 배포와 자동 배포 웹훅
 
