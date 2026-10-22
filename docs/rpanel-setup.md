@@ -44,6 +44,10 @@ DNS 관리 화면에서 서비스 도메인마다 서버의 공인 IP를 가리�
 
 Cargo workspace가 `backend/Cargo.toml`에 있고 실행 바이너리 이름은 `backend/crates/api/Cargo.toml`의 `gageyo-api`입니다. Rpanel이 Rust 바이너리를 빌드하고 실행합니다. 앱 포트는 Rpanel이 지정하므로 `PORT`를 별도로 고정하지 마세요. API는 그 포트의 `127.0.0.1`에서 수신합니다.
 
+**폴더 설정이 중요합니다.** 저장소 최상위 폴더가 아니라 `backend`를 앱 폴더로 지정해야 `Cargo.toml`과 `crates/`, `modules/`, `migrations/` 경로가 함께 보입니다. 빌드 기준은 `backend/Cargo.toml`의 workspace이며, 실행 패키지는 `gageyo-api`입니다. `backend/crates/api`만 앱 폴더로 지정하면 workspace 공용 모듈과 migration 경로를 찾지 못할 수 있습니다.
+
+API 앱에는 패널이 주입하는 `PORT`와 MariaDB 연결 때 제공하는 `DATABASE_URL`을 사용합니다. 포트나 DB 주소를 코드·저장소에 직접 고정하지 마세요. 필요한 운영자 카테고리 관리를 위해 `ADMIN_API_KEY`도 API 앱 환경 변수에 별도로 등록합니다. 변수 값을 바꾼 뒤에는 해당 API 앱을 재시작하거나 다시 배포해야 새 프로세스에 적용됩니다.
+
 ## 4. MariaDB 연결하기
 
 1. `gageyo-api` 앱의 **데이터베이스** 탭을 엽니다.
@@ -114,6 +118,35 @@ Git push 때 자동 배포하려면 앱별 **Git · 웹훅** 탭의 URL과 Secre
 - 이벤트: `Just the push event`
 
 웹훅을 받은 서버가 외부에서 접근 가능해야 합니다. 저장소 브랜치 `main`에 push한 뒤 앱의 배포 로그에서 새 커밋이 반영됐는지 확인합니다. 웹훅을 아직 등록하지 않았다면 프로젝트 화면에서 수동으로 전체 배포할 수 있습니다.
+
+### 백엔드 Cargo 빌드 오류 확인
+
+Cargo workspace manifest는 저장소 루트가 아니라 `backend/Cargo.toml`입니다. 이 파일의 `[workspace.dependencies]`에는 `tracing = "0.1"` 선언이 한 번만 있어야 합니다. API와 모듈은 각각의 `Cargo.toml`에서 `tracing.workspace = true`로 이 공용 선언을 참조합니다. 로그 포맷 설정용 `tracing-subscriber = { version = "0.3", features = ["env-filter"] }`는 다른 crate이므로 지우지 마세요.
+
+`duplicate key 'tracing'` 또는 `duplicate key` manifest 오류가 나오면 다음 순서로 처리합니다.
+
+1. GitHub `main` 브랜치에서 `backend/Cargo.toml`을 열어 `[workspace.dependencies]` 안의 중복 `tracing` 행을 확인합니다.
+2. `tracing = "0.1"` 하나만 남기고 저장합니다. 현재 저장소에서는 중복 선언을 제거한 상태입니다.
+3. 변경 파일 `backend/Cargo.toml`을 `main`에 커밋·푸시합니다. Rpanel은 배포 시작 시 브랜치의 최신 커밋을 가져오므로 배포 로그에서 해당 커밋 SHA를 확인하세요.
+4. Rpanel에서 `gageyo-api` 앱을 열고 **배포**를 눌러 백엔드부터 다시 배포합니다.
+5. 로그에 `Finished release` 또는 이에 해당하는 Cargo 성공 메시지가 나온 뒤 앱 상태와 `/api/health`를 확인합니다.
+
+Cargo가 여전히 중복 선언을 보고한다면 패널이 이전 커밋을 빌드했거나 다른 `Cargo.toml`을 기준으로 삼았을 수 있습니다. 배포 로그의 체크아웃 SHA와 앱 폴더(`backend`)를 먼저 확인한 후 다시 배포하세요. 매번 같은 오류가 나면 저장소 파일에서 `tracing =` 검색 결과가 workspace 선언 한 건인지, 빌드 로그가 그 최신 파일을 읽었는지 대조합니다.
+
+### 자주 보이는 배포 증상
+
+| 증상 | 확인할 항목 |
+|---|---|
+| `could not find Cargo.toml` | API 앱 폴더가 저장소 기준 `backend`인지 확인합니다. |
+| `failed to resolve workspace member` | `backend` 전체가 checkout됐는지, 개별 `crates/api`만 지정하지 않았는지 확인합니다. |
+| `DATABASE_URL` 누락 또는 DB 연결 오류 | MariaDB가 생성·연결됐는지, Rpanel이 API 앱에 DB 변수를 주입했는지 확인합니다. DB 암호를 문서나 빌드 명령에 넣지 마세요. |
+| 빌드는 성공했지만 API가 시작되지 않음 | API 앱의 실행 바이너리가 `gageyo-api`인지, `PORT`가 패널 할당 값인지, 시작 로그에 DB migration 오류가 없는지 확인합니다. |
+| 고객 페이지가 API에서 502를 받음 | 프런트엔드 앱의 API 연결 대상이 `gageyo-api`, 연결 경로가 `/api/`인지 확인하고 API 앱 상태를 먼저 확인합니다. |
+| 화면은 뜨지만 카테고리가 없음 | migration이 API 시작 로그에서 성공했는지, MariaDB가 같은 API 앱에 연결됐는지 확인합니다. |
+| 카테고리 관리자에서 401/503 | Rpanel API 환경 변수의 `ADMIN_API_KEY`가 저장됐는지 확인합니다. 키 변경 후 API를 재시작하고 운영자 화면에서 새 키로 다시 연결합니다. |
+| 프런트엔드 화면이 404 또는 빈 페이지 | 빌드 앱 폴더가 `frontend`, 빌드 명령의 workspace 이름과 출력 경로가 표와 일치하는지 확인합니다. |
+
+Rpanel 배포 로그, Rust 표준 출력, MongoDB 로그는 서로 다른 확인 지점입니다. MongoDB 저장 계층을 API에 연결하기 전에는 애플리케이션 로그가 MongoDB에 기록되지 않고 Rpanel 프로세스 로그에만 나타납니다.
 
 ## 9. 운영 전에 필요한 구현
 
