@@ -51,6 +51,8 @@ Cargo workspace가 `backend/Cargo.toml`에 있고 실행 바이너리 이름은 
 3. 생성한 DB를 이 앱에 연결합니다.
 4. Rpanel이 앱에 `DATABASE_URL`을 주입하는지 앱 설정에서 확인합니다.
 
+카테고리 관리 API를 사용하려면 같은 API 앱의 **환경 변수**에 `ADMIN_API_KEY`를 추가하세요. 값을 저장한 뒤 API 앱을 재시작 또는 재배포합니다. 키는 운영자가 직접 생성한 충분히 긴 임의 문자열로 설정하고 Git 저장소나 문서에 기록하지 마세요. 운영자 화면(`admin.carcare.example.com`)의 **카테고리** 메뉴에서 동일한 키를 입력해 연결하면 카테고리 추가·수정·활성 상태 변경·삭제를 할 수 있습니다. 브라우저에는 현재 세션 동안만 보관됩니다. 키가 비어 있거나 API가 재시작되지 않으면 관리 API는 사용할 수 없습니다.
+
 API가 시작될 때 `backend/migrations/`의 SQL migration을 적용합니다. 별도 SQL 명령을 직접 실행할 필요는 없습니다. Rpanel의 DB 백업을 설정한 뒤 운영 배포를 진행하세요.
 
 **Redis는 현재 gageyo API에서 사용하지 않습니다.** Rpanel에 Redis를 만들거나 연결할 필요가 없습니다. 이후 세션·캐시 기능을 구현할 때 별도로 붙입니다.
@@ -94,7 +96,7 @@ Rpanel은 `frontend/package.json`을 기준으로 의존성을 설치합니다. 
 3. 각 앱의 **SSL** 탭에서 도메인 인증서를 발급하고 HTTPS를 켭니다.
 4. 고객 화면에서 업체 목록과 `/api/health` 응답을 확인합니다.
 
-프런트엔드 앱은 API와 같은 origin으로 요청하므로 별도의 `VITE_API_URL` 환경 변수가 필요하지 않습니다. 로컬 Vite 개발 서버는 `frontend/apps/site/vite.config.js`가 `/api`를 `127.0.0.1:8081`로 프록시합니다.
+프런트엔드 앱은 API와 같은 origin으로 요청하므로 별도의 `VITE_API_URL` 환경 변수가 필요하지 않습니다. 로컬 Vite 개발 서버는 `frontend/apps/site/vite.config.js` 및 `frontend/apps/admin/vite.config.js`가 `/api`를 `127.0.0.1:8081`로 프록시합니다. 고객 화면의 카테고리는 API에서 활성 카테고리를 불러오며, 초기 항목은 DB migration에서 등록됩니다.
 
 ## 8. 배포와 자동 배포 웹훅
 
@@ -131,3 +133,4 @@ Git push 때 자동 배포하려면 앱별 **Git · 웹훅** 탭의 URL과 Secre
 - [Rpanel 데이터베이스 연결](https://github.com/sinji0117/Rpanel/blob/main/docs/database.md)
 - [gageyo API 설정 예시](../deploy/rpanel.env.example)
 - [gageyo 프로젝트 구조](architecture.md)
+
