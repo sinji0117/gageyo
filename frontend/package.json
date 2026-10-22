@@ -1,0 +1,13 @@
+{
+  "name": "gageyo-web",
+  "private": true,
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:site": "npm run dev -w @gageyo/site",
+    "dev:console": "npm run dev -w @gageyo/console",
+    "dev:admin": "npm run dev -w @gageyo/admin",
+    "dev:www": "npm run dev -w @gageyo/www"
+  }
+}

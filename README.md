@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 # carcare
 
 자동차 정비·관리 업체와 운전자를 연결하는 지역 기반 서비스 플랫폼입니다. bandiuri의 모듈형 Rust API, React 워크스페이스, MariaDB·Redis 구성 방식을 바탕으로 자동차 도메인에 맞게 설계합니다.
@@ -45,4 +44,3 @@ API 개발 서버는 `backend`에서 `DATABASE_URL`과 `REDIS_URL`을 설정한 
 ## 진행 상태
 
 저장소에는 초기에 프로젝트 골격과 핵심 데이터 모델/API, 고객·업체·운영자 화면의 시작점을 구성합니다. 이메일 인증, 실제 지도 SDK, 결제 게이트웨이, 알림, 프로덕션 배포 설정은 각 제공자 자격 정보와 별도 구현이 필요한 후속 작업입니다.
-

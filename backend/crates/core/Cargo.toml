@@ -1,0 +1,9 @@
+[package]
+name = "gageyo-core"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+axum.workspace = true
+serde.workspace = true
+thiserror.workspace = true
