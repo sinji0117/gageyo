@@ -22,6 +22,7 @@ anyhow = "1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenvy = "0.15"
 uuid = { version = "1", features = ["v4", "serde"] }
+sha2 = "0.10"
 gageyo-core = { path = "crates/core" }
 gageyo-workshop = { path = "modules/workshop" }
 gageyo-commerce = { path = "modules/commerce" }
