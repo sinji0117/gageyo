@@ -10,7 +10,7 @@ async fn main() -> anyhow::Result<()> {
     let db=MySqlPoolOptions::new().max_connections(20).connect(&database_url).await?;
     sqlx::migrate!("../../migrations").run(&db).await?;
 
-    let workshop_state=gageyo_workshop::WorkshopState{db:db.clone()};
+    let workshop_state=gageyo_workshop::WorkshopState{db:db.clone(),admin_api_key:std::env::var("ADMIN_API_KEY").ok().filter(|v|!v.trim().is_empty())};
     let commerce_state=gageyo_commerce::CommerceState{db};
     let app=Router::new().route("/api/health",get(health))
         .nest("/api",gageyo_workshop::routes().with_state(workshop_state))
@@ -25,3 +25,4 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 async fn health()->Json<serde_json::Value>{Json(serde_json::json!({"status":"ok","service":"gageyo-api"}))}
+
