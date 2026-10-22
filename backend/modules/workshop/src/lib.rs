@@ -1,4 +1,5 @@
 use axum::{extract::{Path, Query, State}, http::{HeaderMap, StatusCode}, routing::{get, patch, post, put}, Json, Router};
+use argon2::{password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString}, Argon2};
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -20,7 +21,11 @@ use uuid::Uuid;
 #[derive(Deserialize)] pub struct CategoryInput { pub group_name:String, pub name:String, pub sort_order:Option<i32>, pub is_active:Option<bool> }
 
 pub fn routes() -> Router<WorkshopState> {
-    Router::new().route("/categories", get(public_categories))
+    Router::new().route("/auth/register", post(register_customer))
+        .route("/auth/login", post(login_customer))
+        .route("/auth/logout", post(logout_customer))
+        .route("/auth/me", get(current_customer))
+        .route("/categories", get(public_categories))
         .route("/admin/categories", get(admin_categories).post(create_category))
         .route("/admin/categories/{id}", put(update_category).delete(delete_category))
         .route("/admin/workshops", get(admin_workshops))
@@ -39,6 +44,48 @@ pub fn routes() -> Router<WorkshopState> {
         .route("/workshops", get(list_workshops)).route("/workshops/{id}", get(workshop_detail))
         .route("/quotes", post(create_quote)).route("/quotes/{id}/offers", get(list_offers).post(partner_create_offer))
         .route("/bookings", post(create_booking)).route("/workshops/{id}/services", get(list_services))
+}
+#[derive(Deserialize)] struct RegisterInput { email:String, password:String, display_name:String, phone:Option<String> }
+#[derive(Deserialize)] struct LoginInput { email:String, password:String }
+#[derive(Serialize, sqlx::FromRow)] struct CustomerProfile { id:String, email:String, display_name:String, phone:Option<String>, role:String }
+fn session_cookie(headers:&HeaderMap)->Option<String>{
+ headers.get(axum::http::header::COOKIE)?.to_str().ok()?.split(';').find_map(|item|{let (name,value)=item.trim().split_once('=')?;(name=="gageyo_session").then(||value.to_owned())})
+}
+fn set_session_cookie(token:&str)->String{
+ let secure=std::env::var("COOKIE_SECURE").map(|v|v!="false").unwrap_or(true);
+ format!("gageyo_session={token}; Path=/api; Max-Age=2592000; HttpOnly; SameSite=Lax{}",if secure{"; Secure"}else{""})
+}
+fn clear_session_cookie()->String{"gageyo_session=; Path=/api; Max-Age=0; HttpOnly; SameSite=Lax; Secure".into()}
+async fn register_customer(State(s):State<WorkshopState>,Json(input):Json<RegisterInput>)->Result<(StatusCode,[(axum::http::header::HeaderName,String);1],Json<CustomerProfile>),(StatusCode,String)>{
+ let email=input.email.trim().to_lowercase();let name=input.display_name.trim();
+ if !email.contains('@')||email.len()>254||name.is_empty()||name.chars().count()>100||input.password.chars().count()<10||input.password.len()>128{return Err((StatusCode::BAD_REQUEST,"이메일, 이름을 확인하고 비밀번호는 10~128자로 입력해 주세요".into()));}
+ let salt=SaltString::generate(&mut OsRng);let password_hash=Argon2::default().hash_password(input.password.as_bytes(),&salt).map_err(|_|internal(sqlx::Error::Protocol("password hashing failed".into())))?.to_string();
+ let id=Uuid::new_v4().to_string();
+ let result=sqlx::query("INSERT INTO users (id,email,display_name,phone,role,password_hash) VALUES (?,?,?,?,'customer',?)").bind(&id).bind(&email).bind(name).bind(input.phone.as_deref().map(str::trim).filter(|v|!v.is_empty())).bind(password_hash).execute(&s.db).await;
+ if let Err(e)=result { if let sqlx::Error::Database(db)=&e {if db.code().as_deref()==Some("1062"){return Err((StatusCode::CONFLICT,"이미 가입된 이메일입니다".into()));}} return Err(internal(e)); }
+ let token=format!("{}{}",Uuid::new_v4().simple(),Uuid::new_v4().simple());
+ sqlx::query("INSERT INTO auth_sessions (id,user_id,token_hash,expires_at) VALUES (?,?,?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 30 DAY))").bind(Uuid::new_v4().to_string()).bind(&id).bind(token_hash(&token)).execute(&s.db).await.map_err(internal)?;
+ let profile=sqlx::query_as::<_,CustomerProfile>("SELECT id,email,display_name,phone,role FROM users WHERE id=?").bind(id).fetch_one(&s.db).await.map_err(internal)?;
+ Ok((StatusCode::CREATED,[(axum::http::header::SET_COOKIE,set_session_cookie(&token))],Json(profile)))
+}
+async fn login_customer(State(s):State<WorkshopState>,Json(input):Json<LoginInput>)->Result<([(axum::http::header::HeaderName,String);1],Json<CustomerProfile>),(StatusCode,String)>{
+ let email=input.email.trim().to_lowercase();
+ let row=sqlx::query_as::<_,(String,String,String,Option<String>,String,Option<String>)>("SELECT id,email,display_name,phone,role,password_hash FROM users WHERE email=?").bind(email).fetch_optional(&s.db).await.map_err(internal)?;
+ let Some((id,email,display_name,phone,role,hash))=row else{return Err((StatusCode::UNAUTHORIZED,"이메일 또는 비밀번호를 확인해 주세요".into()));};
+ let valid=hash.as_deref().and_then(|hash|PasswordHash::new(hash).ok()).is_some_and(|parsed|Argon2::default().verify_password(input.password.as_bytes(),&parsed).is_ok());
+ if !valid||role!="customer"{return Err((StatusCode::UNAUTHORIZED,"이메일 또는 비밀번호를 확인해 주세요".into()));}
+ let token=format!("{}{}",Uuid::new_v4().simple(),Uuid::new_v4().simple());
+ sqlx::query("INSERT INTO auth_sessions (id,user_id,token_hash,expires_at) VALUES (?,?,?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 30 DAY))").bind(Uuid::new_v4().to_string()).bind(&id).bind(token_hash(&token)).execute(&s.db).await.map_err(internal)?;
+ Ok(([(axum::http::header::SET_COOKIE,set_session_cookie(&token))],Json(CustomerProfile{id,email,display_name,phone,role})))
+}
+async fn current_customer(State(s):State<WorkshopState>,headers:HeaderMap)->Result<Json<CustomerProfile>,(StatusCode,String)>{
+ let token=session_cookie(&headers).ok_or((StatusCode::UNAUTHORIZED,"로그인이 필요합니다".into()))?;
+ let profile=sqlx::query_as::<_,CustomerProfile>("SELECT u.id,u.email,u.display_name,u.phone,u.role FROM auth_sessions a JOIN users u ON u.id=a.user_id WHERE a.token_hash=? AND a.expires_at>UTC_TIMESTAMP() AND u.role='customer'").bind(token_hash(&token)).fetch_optional(&s.db).await.map_err(internal)?.ok_or((StatusCode::UNAUTHORIZED,"로그인이 필요합니다".into()))?;
+ Ok(Json(profile))
+}
+async fn logout_customer(State(s):State<WorkshopState>,headers:HeaderMap)->(StatusCode,[(axum::http::header::HeaderName,String)],Json<serde_json::Value>){
+ if let Some(token)=session_cookie(&headers){let _=sqlx::query("DELETE FROM auth_sessions WHERE token_hash=?").bind(token_hash(&token)).execute(&s.db).await;}
+ (StatusCode::OK,[(axum::http::header::SET_COOKIE,clear_session_cookie())],Json(serde_json::json!({"ok":true})))
 }
 fn token_hash(token:&str)->String { Sha256::digest(token.as_bytes()).iter().map(|byte|format!("{byte:02x}")).collect() }
 async fn partner_workshop_id(s:&WorkshopState,headers:&HeaderMap)->Result<String,(StatusCode,String)>{
