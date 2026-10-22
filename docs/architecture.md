@@ -11,11 +11,14 @@
 gageyo-api (Rust / Axum)
  ├─ workshop 모듈: 업체·서비스·견적·예약
  ├─ commerce 모듈: 상품·주문·재고
- └─ MariaDB: 영구 데이터
-       └─ Redis: 이후 세션·검색 캐시·요청 제한에 사용
+ ├─ MariaDB: 업체·견적·예약·상품 등 서비스 데이터
+ ├─ MongoDB: 애플리케이션 로그 저장소 (연결 예정)
+ └─ Redis: 현재 사용하지 않음; 이후 세션·검색 캐시·요청 제한에 검토
 ```
 
 Rust 코드는 `backend/` Cargo workspace로 분리했습니다. 각 도메인 모듈은 독립 router와 상태(`MySqlPool`)를 받아 API 실행기에 연결됩니다. React 화면은 `frontend/` npm workspace이고 `packages/ui`에서 공용 API 요청과 금액 서식을 제공합니다.
+
+MariaDB는 서비스 업무 데이터를 저장하고, MongoDB는 API 애플리케이션 로그 저장에 사용할 예정입니다. 현재 `tracing` 출력은 프로세스 표준 출력(stdout)으로만 전송되며 MongoDB 로그 저장 연결은 아직 구현되지 않았습니다. 로그를 MongoDB에 보관하려면 API에 `MONGODB_URI` 연결과 tracing 저장 계층을 추가해야 합니다.
 
 ## 주요 데이터 경계
 
