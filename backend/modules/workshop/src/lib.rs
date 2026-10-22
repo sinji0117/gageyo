@@ -85,7 +85,7 @@ async fn create_quote(State(s): State<WorkshopState>, Json(req): Json<QuoteReque
     sqlx::query("INSERT INTO quote_requests (id, vehicle, service_category, description, district, customer_phone, status) VALUES (?, ?, ?, ?, ?, ?, 'open')").bind(&id).bind(req.vehicle).bind(req.service_category).bind(req.description).bind(req.district).bind(req.customer_phone).execute(&s.db).await.map_err(internal)?;
     Ok((StatusCode::CREATED,Json(serde_json::json!({"id":id,"status":"open"}))))
 }
-async fn list_offers(State(s): State<WorkshopState>, Path(id): Path<String>) -> Result<Json<Vec<serde_json::Value>>, (StatusCode,String)> {
+async fn list_offers(State(s): State<WorkshopState>, Path(id): Path<String>) -> Result<Json<Vec<Offer>>, (StatusCode,String)> {
     let rows=sqlx::query_as::<_,Offer>("SELECT id, workshop_id, amount, description, valid_until, created_at FROM quote_offers WHERE quote_id=? ORDER BY amount").bind(id).fetch_all(&s.db).await.map_err(internal)?;
     Ok(Json(rows))
 }
@@ -101,4 +101,3 @@ async fn create_booking(State(s): State<WorkshopState>, Json(req): Json<BookingR
     Ok((StatusCode::CREATED,Json(serde_json::json!({"id":id,"status":"requested"}))))
 }
 fn internal(e: sqlx::Error)->(StatusCode,String){tracing::error!(error=%e,"database request failed");(StatusCode::INTERNAL_SERVER_ERROR,"요청을 처리하지 못했습니다".into())}
-
