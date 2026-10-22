@@ -41,6 +41,8 @@ npm run dev:site
 
 API 개발 서버는 `backend`에서 `DATABASE_URL`과 `REDIS_URL`을 설정한 뒤 `cargo run -p gageyo-api`로 실행합니다. 환경 변수 예시는 `.env.example`을 참고하세요.
 
+Rpanel Git 자동 배포 설정은 [Rpanel 배포 안내](docs/rpanel-setup.md)를 참고하세요.
+
 ## 진행 상태
 
 저장소에는 초기에 프로젝트 골격과 핵심 데이터 모델/API, 고객·업체·운영자 화면의 시작점을 구성합니다. 이메일 인증, 실제 지도 SDK, 결제 게이트웨이, 알림, 프로덕션 배포 설정은 각 제공자 자격 정보와 별도 구현이 필요한 후속 작업입니다.

@@ -19,7 +19,7 @@ async fn main() -> anyhow::Result<()> {
         .layer(CorsLayer::new().allow_origin(Any).allow_methods([Method::GET,Method::POST,Method::PUT,Method::PATCH,Method::DELETE]).allow_headers(Any))
         .layer(CompressionLayer::new()).layer(TraceLayer::new_for_http());
     let port=std::env::var("PORT").unwrap_or_else(|_|"8081".into());
-    let listener=tokio::net::TcpListener::bind(format!("0.0.0.0:{port}")).await?;
+    let listener=tokio::net::TcpListener::bind(format!("127.0.0.1:{port}")).await?;
     tracing::info!(%port,"gageyo API is listening");
     axum::serve(listener,app).await?;
     Ok(())
