@@ -19,16 +19,16 @@ DNS 관리 화면에서 서비스 도메인마다 서버의 공인 IP를 가리�
 
 | 화면 | 예시 도메인 | 용도 |
 |---|---|---|
-| 마케팅 소개 | `carcare.example.com` | `frontend/apps/www` |
-| 운전자 서비스 | `app.carcare.example.com` | 업체 탐색·견적·예약·상품 |
-| 업체 센터 | `partner.carcare.example.com` | 업체 견적·예약·상품 관리 |
-| 플랫폼 운영 | `admin.carcare.example.com` | 운영자 화면 |
+| 마케팅 소개 | `gageyo.com` | `frontend/apps/www` |
+| 운전자 서비스 | `app.gageyo.com` | 업체 탐색·견적·예약·상품 |
+| 업체 센터 | `partner.gageyo.com` | 업체 견적·예약·상품 관리 |
+| 플랫폼 운영 | `admin.gageyo.com` | 운영자 화면 |
 
-실제 도메인으로 바꾸어 사용하세요. 루트 도메인을 마케팅 화면에 쓰고 싶으면 `carcare.example.com` 대신 `example.com`을 연결해도 됩니다. DNS가 전파된 뒤 Rpanel 각 앱의 SSL 탭에서 HTTPS 인증서를 발급합니다.
+기본 도메인은 `gageyo.com`입니다. DNS 관리 화면에서 `@`, `app`, `partner`, `admin` 호스트에 서버 공인 IP를 가리키는 A 레코드를 각각 추가하세요. DNS가 전파된 뒤 Rpanel 각 앱의 SSL 탭에서 HTTPS 인증서를 발급합니다.
 
 ## 3. Rpanel 프로젝트와 API 앱 만들기
 
-1. Rpanel 왼쪽의 **프로젝트**에서 **새 프로젝트**를 만듭니다. 예: `carcare`.
+1. Rpanel 왼쪽의 **프로젝트**에서 **새 프로젝트**를 만듭니다. 예: `gageyo`.
 2. 프로젝트 안에서 **새 앱**을 만들고 **백엔드 (API 서버)** 역할과 **Rust**를 선택합니다.
 3. Git 저장소 주소와 빌드 항목을 다음처럼 설정합니다.
 
@@ -51,7 +51,7 @@ Cargo workspace가 `backend/Cargo.toml`에 있고 실행 바이너리 이름은 
 3. 생성한 DB를 이 앱에 연결합니다.
 4. Rpanel이 앱에 `DATABASE_URL`을 주입하는지 앱 설정에서 확인합니다.
 
-카테고리 관리 API를 사용하려면 같은 API 앱의 **환경 변수**에 `ADMIN_API_KEY`를 추가하세요. 값을 저장한 뒤 API 앱을 재시작 또는 재배포합니다. 키는 운영자가 직접 생성한 충분히 긴 임의 문자열로 설정하고 Git 저장소나 문서에 기록하지 마세요. 운영자 화면(`admin.carcare.example.com`)의 **카테고리** 메뉴에서 동일한 키를 입력해 연결하면 카테고리 추가·수정·활성 상태 변경·삭제를 할 수 있습니다. 브라우저에는 현재 세션 동안만 보관됩니다. 키가 비어 있거나 API가 재시작되지 않으면 관리 API는 사용할 수 없습니다.
+카테고리 관리 API를 사용하려면 같은 API 앱의 **환경 변수**에 `ADMIN_API_KEY`를 추가하세요. 값을 저장한 뒤 API 앱을 재시작 또는 재배포합니다. 키는 운영자가 직접 생성한 충분히 긴 임의 문자열로 설정하고 Git 저장소나 문서에 기록하지 마세요. 운영자 화면(`admin.gageyo.com`)의 **카테고리** 메뉴에서 동일한 키를 입력해 연결하면 카테고리 추가·수정·활성 상태 변경·삭제를 할 수 있습니다. 브라우저에는 현재 세션 동안만 보관됩니다. 키가 비어 있거나 API가 재시작되지 않으면 관리 API는 사용할 수 없습니다.
 
 API가 시작될 때 `backend/migrations/`의 SQL migration을 적용합니다. 별도 SQL 명령을 직접 실행할 필요는 없습니다. Rpanel의 DB 백업을 설정한 뒤 운영 배포를 진행하세요.
 
@@ -73,16 +73,16 @@ API가 시작될 때 `backend/migrations/`의 SQL migration을 적용합니다. 
 
 | 화면 | 화면 용도 | 앱 폴더 (Root Directory) | 빌드 명령 | 출력 폴더 | 도메인 예시 |
 |---|---|---|---|---|---|
-| 고객 서비스 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/site` | `apps/site/dist` | `app.carcare.example.com` |
-| 업체 센터 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/console` | `apps/console/dist` | `partner.carcare.example.com` |
-| 운영자 화면 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/admin` | `apps/admin/dist` | `admin.carcare.example.com` |
-| 마케팅 소개 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/www` | `apps/www/dist` | `carcare.example.com` |
+| 고객 서비스 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/site` | `apps/site/dist` | `app.gageyo.com` |
+| 업체 센터 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/console` | `apps/console/dist` | `partner.gageyo.com` |
+| 운영자 화면 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/admin` | `apps/admin/dist` | `admin.gageyo.com` |
+| 마케팅 소개 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/www` | `apps/www/dist` | `gageyo.com` |
 
 모든 정적 앱에서 다음 값도 동일하게 설정합니다.
 
 - Git 저장소: `git@github.com:sinji0117/gageyo.git`
 - 브랜치: `main`
-- Rpanel 프로젝트: 2단계에서 만든 `carcare`
+- Rpanel 프로젝트: 2단계에서 만든 `gageyo`
 - API 연결: 3단계의 `gageyo-api`
 
 Rpanel은 `frontend/package.json`을 기준으로 의존성을 설치합니다. 현재 `package-lock.json`은 저장소에 없으므로 Rpanel이 `npm install`을 사용합니다. 패키지 버전을 고정하는 lock 파일을 추가하면 다음 배포부터 재현 가능한 설치에 `npm ci`를 쓸 수 있습니다.
@@ -133,4 +133,3 @@ Git push 때 자동 배포하려면 앱별 **Git · 웹훅** 탭의 URL과 Secre
 - [Rpanel 데이터베이스 연결](https://github.com/sinji0117/Rpanel/blob/main/docs/database.md)
 - [gageyo API 설정 예시](../deploy/rpanel.env.example)
 - [gageyo 프로젝트 구조](architecture.md)
-
