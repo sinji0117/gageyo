@@ -98,7 +98,7 @@ export default function App() {
     [user, open],
   );
 
-  // 메일 링크·결제창에서 돌아온 주소 처리 (?shop= ?quote= ?order= ?my= ?reset= ?inquiry= ?pay=)
+  // 메일 링크·결제창·소개 페이지에서 온 주소 처리 (?shop= ?quote= ?order= ?my= ?reset= ?inquiry= ?pay= ?request=)
   useEffect(() => {
     if (!userLoaded) return;
     const p = new URLSearchParams(window.location.search);
@@ -126,6 +126,10 @@ export default function App() {
       toast(p.get("message") || "결제가 취소되었습니다.");
       if (orderId) open({ type: "order", id: orderId, phone: recallOrderPhone(orderId) });
       return;
+    }
+    if (["quote", "support", "lookup", "cart"].includes(p.get("request"))) {
+      setUrl({});
+      return open({ type: p.get("request") });
     }
     if (p.get("shop")) return open({ type: "workshop", id: p.get("shop") });
     if (p.get("quote")) return open({ type: "quoteView", id: p.get("quote") });
