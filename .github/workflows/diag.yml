@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: ["1.75", "1.78", "1.80", "1.82", "1.84", "1.86", "stable"]
+        rust: ["1.84", "1.86", "1.87"]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
@@ -16,6 +16,7 @@ jobs:
       - name: build
         working-directory: backend
         run: |
-          rustc --version
-          cargo build --release 2>&1 | grep -E -A25 "^(error|warning: unused)" | head -150
-          cargo build --release
+          cargo build --release --message-format=short 2>&1 | tee /tmp/b.log | tail -3
+          v=$(rustc --version)
+          grep -E "error" /tmp/b.log | head -20 | while IFS= read -r l; do echo "::error::$v | $l"; done
+          ! grep -q "^error" /tmp/b.log
