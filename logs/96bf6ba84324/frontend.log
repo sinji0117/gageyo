@@ -1,5 +1,5 @@
 
-added 70 packages in 7s
+added 70 packages in 6s
 
 > build
 > npm run build --workspaces --if-present
@@ -16,7 +16,7 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-BHK4oL5Q.css  [39m[1m[2m  7.67 kB[22m[1m[22m[2m │ gzip:  2.05 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-B_ixNA-N.js   [39m[1m[2m239.19 kB[22m[1m[22m[2m │ gzip: 74.04 kB[22m
-[32m✓ built in 1.09s[39m
+[32m✓ built in 1.16s[39m
 
 > @gageyo/console@0.1.0 build
 > vite build
@@ -29,7 +29,7 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-DWWx8bNG.css  [39m[1m[2m  5.11 kB[22m[1m[22m[2m │ gzip:  1.70 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-BIJjEDp7.js   [39m[1m[2m236.71 kB[22m[1m[22m[2m │ gzip: 73.50 kB[22m
-[32m✓ built in 1.09s[39m
+[32m✓ built in 1.17s[39m
 
 > @gageyo/site@0.1.0 build
 > vite build
@@ -42,7 +42,7 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:  0.34 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-OT1scDhL.css  [39m[1m[2m  9.89 kB[22m[1m[22m[2m │ gzip:  2.89 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-CVG5bDqN.js   [39m[1m[2m239.61 kB[22m[1m[22m[2m │ gzip: 74.85 kB[22m
-[32m✓ built in 1.13s[39m
+[32m✓ built in 1.06s[39m
 
 > @gageyo/www@0.1.0 build
 > vite build
@@ -55,4 +55,4 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.39 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-_oWw1pAR.css  [39m[1m[2m  2.11 kB[22m[1m[22m[2m │ gzip:  0.98 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-Bbyen_6W.js   [39m[1m[2m224.46 kB[22m[1m[22m[2m │ gzip: 70.29 kB[22m
-[32m✓ built in 1.17s[39m
+[32m✓ built in 1.00s[39m
