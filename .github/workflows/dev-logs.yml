@@ -30,6 +30,7 @@ jobs:
         run: |
           mkdir -p /tmp/logs
           set +e
+          (cd backend && cargo test -p gageyo-core 2>&1) > /tmp/logs/core-test.log; echo "core test: $?" >> /tmp/logs/summary.txt
           (cd backend && cargo build 2>&1) > /tmp/logs/cargo-build.log; echo "cargo build: $?" >> /tmp/logs/summary.txt
           (cd backend && cargo test 2>&1) > /tmp/logs/cargo-test.log; echo "cargo test: $?" >> /tmp/logs/summary.txt
           (cd frontend && npm install --no-audit --no-fund 2>&1 && npm run build 2>&1) > /tmp/logs/frontend.log; echo "frontend: $?" >> /tmp/logs/summary.txt
