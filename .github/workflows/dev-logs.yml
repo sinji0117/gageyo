@@ -46,4 +46,4 @@ jobs:
           git fetch origin ci-logs:ci-logs 2>/dev/null && git checkout ci-logs || git checkout --orphan ci-logs
           git rm -rq --cached . 2>/dev/null || true
           mkdir -p logs/$sha && cp /tmp/logs/* logs/$sha/ 2>/dev/null || true
-          git add logs/$sha && git commit -qm "logs $sha" && git push -q origin ci-logs
+          git add -f logs/$sha && git commit -qm "logs $sha" && git push -q origin ci-logs
