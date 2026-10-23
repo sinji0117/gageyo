@@ -1,0 +1,21 @@
+name: diag
+on:
+  push:
+    branches: ["fix/**"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: ["1.75", "1.78", "1.80", "1.82", "1.84", "1.86", "stable"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with: { toolchain: "${{ matrix.rust }}" }
+      - name: build
+        working-directory: backend
+        run: |
+          rustc --version
+          cargo build --release 2>&1 | grep -E -A25 "^(error|warning: unused)" | head -150
+          cargo build --release
