@@ -16,7 +16,7 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-BHK4oL5Q.css  [39m[1m[2m  7.67 kB[22m[1m[22m[2m │ gzip:  2.05 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-ButKd6Rb.js   [39m[1m[2m239.71 kB[22m[1m[22m[2m │ gzip: 74.24 kB[22m
-[32m✓ built in 1.09s[39m
+[32m✓ built in 1.10s[39m
 
 > @gageyo/console@0.1.0 build
 > vite build
@@ -29,30 +29,20 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-DWWx8bNG.css  [39m[1m[2m  5.11 kB[22m[1m[22m[2m │ gzip:  1.70 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-BKJZBtar.js   [39m[1m[2m237.23 kB[22m[1m[22m[2m │ gzip: 73.69 kB[22m
-[32m✓ built in 1.10s[39m
+[32m✓ built in 1.07s[39m
 
 > @gageyo/site@0.1.0 build
 > vite build
 
 [36mvite v7.3.7 [32mbuilding client environment for production...[36m[39m
 transforming...
-[32m✓[39m 3 modules transformed.
-[31m✗[39m Build failed in 53ms
-[31merror during build:
-[31mCould not resolve "./index.css" from "src/main.jsx"[31m
-file: [36m/home/runner/work/gageyo/gageyo/frontend/apps/site/src/main.jsx[31m
-    at getRollupError (file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/parseAst.js:337:41)
-    at error (file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/parseAst.js:333:42)
-    at ModuleLoader.handleInvalidResolvedId (file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/node-entry.js:22841:24)
-    at file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/node-entry.js:22801:26[39m
-npm error Lifecycle script `build` failed with error:
-npm error code 1
-npm error path /home/runner/work/gageyo/gageyo/frontend/apps/site
-npm error workspace @gageyo/site@0.1.0
-npm error location /home/runner/work/gageyo/gageyo/frontend/apps/site
-npm error command failed
-npm error command sh -c vite build
-
+[32m✓[39m 57 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  1.35 kB[22m[1m[22m[2m │ gzip:  0.79 kB[22m
+[2mdist/[22m[2massets/[22m[35mindex-CVhcQlSr.css  [39m[1m[2m 23.32 kB[22m[1m[22m[2m │ gzip:  5.50 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-BsDCWqBk.js   [39m[1m[2m308.23 kB[22m[1m[22m[2m │ gzip: 92.94 kB[22m
+[32m✓ built in 1.26s[39m
 
 > @gageyo/www@0.1.0 build
 > vite build
@@ -65,4 +55,4 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.39 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-_oWw1pAR.css  [39m[1m[2m  2.11 kB[22m[1m[22m[2m │ gzip:  0.98 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-Bbyen_6W.js   [39m[1m[2m224.46 kB[22m[1m[22m[2m │ gzip: 70.29 kB[22m
-[32m✓ built in 1.04s[39m
+[32m✓ built in 1.06s[39m

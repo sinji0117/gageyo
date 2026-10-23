@@ -1,18 +1,18 @@
  Downloading crates ...
-  Downloaded matchers v0.2.0
-  Downloaded async-compression v0.4.51
-  Downloaded compression-codecs v0.4.46
-  Downloaded nu-ansi-term v0.50.3
   Downloaded anyhow v1.0.104
-  Downloaded aho-corasick v1.1.5
   Downloaded compression-core v0.4.34
-  Downloaded regex-syntax v0.8.11
-  Downloaded sharded-slab v0.1.7
-  Downloaded regex-automata v0.4.18
+  Downloaded compression-codecs v0.4.46
   Downloaded thread_local v1.1.10
-  Downloaded tokio-util v0.7.20
-  Downloaded tracing-subscriber v0.3.23
+  Downloaded matchers v0.2.0
   Downloaded tracing-log v0.2.0
+  Downloaded nu-ansi-term v0.50.3
+  Downloaded async-compression v0.4.51
+  Downloaded sharded-slab v0.1.7
+  Downloaded tokio-util v0.7.20
+  Downloaded aho-corasick v1.1.5
+  Downloaded tracing-subscriber v0.3.23
+  Downloaded regex-syntax v0.8.11
+  Downloaded regex-automata v0.4.18
    Compiling log v0.4.34
    Compiling futures-sink v0.3.34
    Compiling tracing-core v0.1.36
@@ -24,33 +24,33 @@
    Compiling compression-codecs v0.4.46
    Compiling async-compression v0.4.51
    Compiling tokio-util v0.7.20
+   Compiling axum-core v0.5.6
    Compiling hyper-util v0.1.21
-   Compiling tower v0.5.3
-   Compiling tower-http v0.6.11
    Compiling sqlx-core v0.8.6
    Compiling tokio-rustls v0.26.6
+   Compiling tower v0.5.3
+   Compiling tower-http v0.6.11
+   Compiling sqlx-mysql v0.8.6
    Compiling hyper-rustls v0.27.10
    Compiling multer v3.1.0
-   Compiling axum-core v0.5.6
-   Compiling sqlx-mysql v0.8.6
-   Compiling lettre v0.11.23
    Compiling axum v0.8.9
+   Compiling lettre v0.11.23
    Compiling sqlx-macros-core v0.8.6
-   Compiling reqwest v0.12.28
    Compiling sqlx-macros v0.8.6
+   Compiling reqwest v0.12.28
    Compiling regex-syntax v0.8.11
    Compiling anyhow v1.0.104
+   Compiling sqlx v0.8.6
    Compiling tracing-log v0.2.0
    Compiling sharded-slab v0.1.7
    Compiling thread_local v1.1.10
-   Compiling sqlx v0.8.6
    Compiling gageyo-core v0.2.0 (/home/runner/work/gageyo/gageyo/backend/crates/core)
    Compiling nu-ansi-term v0.50.3
    Compiling regex-automata v0.4.18
-   Compiling gageyo-support v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/support)
    Compiling gageyo-commerce v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/commerce)
    Compiling matchers v0.2.0
    Compiling tracing-subscriber v0.3.23
    Compiling gageyo-workshop v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/workshop)
+   Compiling gageyo-support v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/support)
    Compiling gageyo-api v0.2.0 (/home/runner/work/gageyo/gageyo/backend/crates/api)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 25.42s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 24.81s
