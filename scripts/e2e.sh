@@ -235,7 +235,7 @@ call GET /me/bookings cus ""; is "내 예약 완료" "$(j "[.[] | select(.id==\"
 call POST /me/reviews cus "{\"booking_id\":\"$BID\",\"rating\":5,\"content\":\"친절하고 꼼꼼해요\"}"; expect "리뷰 쓰기" 201
 RID=$(j .id)
 call POST /me/reviews cus "{\"booking_id\":\"$BID\",\"rating\":4,\"content\":\"한 번 더 씀\"}"; expect "리뷰 두 번 거부" 409
-call GET "/workshops/$WID" - ""; is "평점 반영" "$(j .rating)" 5
+call GET "/workshops/$WID" - ""; is "평점 반영" "$(j '.rating == 5')" true
 is "리뷰 수" "$(j .review_count)" 1
 call PUT "/partner/reviews/$RID/reply" ptn '{"reply":"감사합니다!"}'; expect "답글" 204
 admin PATCH "/admin/reviews/$RID" '{"status":"hidden"}'; expect "리뷰 숨김" 204
