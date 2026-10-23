@@ -9,7 +9,7 @@
 use axum::{
     extract::{Query, State},
     http::StatusCode,
-    routing::{get, post},
+    routing::get,
     Json, Router,
 };
 use chrono::{Datelike, NaiveDateTime};
