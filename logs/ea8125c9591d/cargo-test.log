@@ -3,7 +3,7 @@
    Compiling gageyo-workshop v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/workshop)
    Compiling gageyo-support v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/support)
    Compiling gageyo-core v0.2.0 (/home/runner/work/gageyo/gageyo/backend/crates/core)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.32s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.17s
      Running unittests src/main.rs (target/debug/deps/gageyo_api-4e46e1ea4fcd16e1)
 
 running 1 test
@@ -26,13 +26,13 @@ test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
      Running unittests src/lib.rs (target/debug/deps/gageyo_core-b0e426083b0588c9)
 
 running 32 tests
-test auth::tests::ip_headers ... ok
 test config::tests::bind_address_priority ... ok
-test auth::tests::cookies_and_tokens ... ok
+test auth::tests::ip_headers ... ok
 test config::tests::toss_key_pairs ... ok
+test auth::tests::cookies_and_tokens ... ok
 test config::tests::list_parsing ... ok
-test error::tests::status_codes ... ok
 test files::tests::image_url_rules ... ok
+test error::tests::status_codes ... ok
 test files::tests::rejects_non_images_and_svg ... ok
 test files::tests::rel_path_shape ... ok
 test config::tests::upload_dir_detects_rpanel_layout ... ok
@@ -59,7 +59,7 @@ test toss::tests::confirm_and_cancel_against_mock ... ok
 test auth::tests::password_rules ... ok
 test files::tests::png_is_reencoded_and_resized ... ok
 
-test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.88s
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.83s
 
      Running unittests src/lib.rs (target/debug/deps/gageyo_support-8df719281bb38a6e)
 
