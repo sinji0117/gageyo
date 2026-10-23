@@ -77,7 +77,7 @@ impl SecretBox {
 
     /// 서버 비밀키로 만든 HMAC-SHA256 (16진수). 인증 코드처럼 짧은 값을 DB 에 해시로 둘 때 씀
     pub fn keyed_hash(&self, parts: &[&str]) -> String {
-        let mut mac = Hmac::<Sha256>::new_from_slice(&self.mac_key).expect("hmac key");
+        let mut mac = <Hmac<Sha256> as Mac>::new_from_slice(&self.mac_key).expect("hmac key");
         for (i, p) in parts.iter().enumerate() {
             if i > 0 {
                 mac.update(b"|");

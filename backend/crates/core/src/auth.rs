@@ -220,6 +220,28 @@ fn fail_key(scope: Scope, email: &str) -> String {
     format!("login-fail:{}:{email}", scope.as_str())
 }
 
+/// 비밀번호 설정·재설정 링크 만들기 (30분 유효, 한 번만 사용).
+/// 화면 주소는 범위에 따라 고객·파트너·운영자 화면입니다.
+pub async fn create_password_reset(state: &AppState, user_id: &str, scope: Scope) -> AppResult<String> {
+    let token = random_token();
+    sqlx::query("DELETE FROM password_resets WHERE user_id = ? AND (used_at IS NOT NULL OR expires_at < NOW())")
+        .bind(user_id)
+        .execute(&state.db)
+        .await?;
+    sqlx::query("INSERT INTO password_resets (token_hash, user_id, scope, expires_at) VALUES (?, ?, ?, NOW() + INTERVAL 30 MINUTE)")
+        .bind(token_hash(&token))
+        .bind(user_id)
+        .bind(scope.as_str())
+        .execute(&state.db)
+        .await?;
+    let base = match scope {
+        Scope::Customer => &state.cfg.app_url,
+        Scope::Partner => &state.cfg.partner_url,
+        Scope::Admin => &state.cfg.admin_url,
+    };
+    Ok(format!("{base}/?reset={token}"))
+}
+
 /// 세션 쿠키 주인
 #[derive(Debug, Clone, Serialize, sqlx::FromRow)]
 pub struct SessionUser {
