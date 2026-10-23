@@ -1,0 +1,267 @@
+== 기본
+  ok   상태 확인
+  ok   카테고리
+  ok   기본 카테고리 18개 이상
+  ok   없는 주소는 JSON 404
+  ok   오류는 JSON error 문자열
+  ok   공개 설정
+  ok   토스 키 공개
+== 운영자 첫 설정 (비밀번호 설정 링크 → 로그인 → OTP)
+  ok   운영자 비밀번호 설정 요청
+  ok   설정 링크가 로그에 남음(메일 미설정)
+  ok   운영자 비밀번호 설정
+  ok   같은 링크 재사용 거부
+  ok   운영자 로그인
+  ok   운영자 내 정보
+  ok   ADMIN_EMAILS 밖은 거부
+  ok   로그인 없이 운영자 API 거부
+  ok   틀린 운영자 키 거부
+  ok   OTP 등록 시작
+  ok   틀린 OTP 코드 거부
+  ok   OTP 켜기
+  ok   OTP 없이 로그인 → otp_required
+  ok   otp_required 코드
+  ok   OTP 로 로그인
+  ok   운영자 세션으로 업체 목록
+== 파트너 입점 신청 → 승인
+  ok   입점 신청
+  ok   같은 이메일 재신청 거부
+  ok   틀린 사업자번호 거부
+  ok   파트너 내 정보
+  ok   승인 대기
+  ok   승인 전 견적 요청 막힘
+  ok   고객 업체 목록
+  ok   승인 전 업체는 안 보임
+  ok   반려 사유 없으면 거부
+  ok   운영자 승인
+  ok   승인됨
+  ok   파트너 로그아웃
+  ok   로그아웃 뒤 막힘
+  ok   파트너 로그인
+== 업체 정보·서비스·상품
+  ok   영업시간·휴무일
+  ok   휴무일 정리
+  ok   영업시간 거꾸로 거부
+  ok   서비스 등록
+  ok   상품 등록
+  ok   상품 2 등록
+  ok   정가<판매가 거부
+  ok   운영자 판매 중지
+  ok   중지 상품 수정
+  ok   운영자가 막은 상품은 파트너가 못 엶
+  ok   다시 판매
+  ok   분야 검색
+  ok   분야로 찾음
+  ok   반경 검색
+  ok   3km 안에 있음
+  ok   거리 계산
+  ok   부산 반경에는 없음
+  ok   업체 상세
+  ok   서비스 표시
+  ok   분야 2개
+  ok   상품 검색
+  ok   상품 찾음
+== 고객 가입·로그인
+  ok   고객 가입
+  ok   연락처 정리
+  ok   내 정보
+  ok   중복 가입 거부
+  ok   파트너 계정은 고객 로그인 불가
+  ok   내 차량 등록
+  ok   관심 업체
+  ok   관심 업체 목록
+== 견적 요청 → 업체 견적 → 고객 선택
+  ok   견적 요청
+  ok   없는 분야 거부
+  ok   파트너 견적 요청 목록
+  ok   분야·지역 맞는 요청 보임
+  ok   답하기 전 연락처 가림
+  ok   견적 보내기
+  ok   같은 요청에 두 번 거부
+  ok   다른 사람은 연락처 없이 못 봄
+  ok   연락처로 확인
+  ok   요청한 회원은 봄
+  ok   견적 1건
+  ok   마이페이지 견적
+  ok   견적 선택
+  ok   선택한 업체
+  ok   두 번 선택 거부
+  ok   선택된 견적은 연락처 보임
+== 예약 → 확정 → 완료 → 리뷰
+  ok   영업시간 밖 거부
+  ok   휴무일 거부
+  ok   지난 시간 거부
+  ok   예약 신청
+  ok   같은 시간 중복 거부
+  ok   신청 → 바로 완료 가능
+  ok   완료 → 신청 되돌리기 거부
+  ok   내 예약 완료
+  ok   리뷰 쓰기
+  ok   리뷰 두 번 거부
+  FAIL 평점 반영 — 기대 [5], 받음 [5.0]
+  ok   리뷰 수
+  ok   답글
+  ok   리뷰 숨김
+  ok   숨기면 평점에서 빠짐
+  ok   리뷰 다시 공개
+  ok   비회원 예약
+  ok   틀린 연락처 조회 거부
+  ok   비회원 예약 조회
+  ok   거절 사유 필요
+  ok   비회원 예약 취소
+== 주문 (토스 카드)
+  ok   결제 설정
+  ok   재고보다 많이 주문 거부
+  ok   토스 주문
+  ok   같은 상품 줄 합쳐 금액 계산
+  ok   결제창 정보
+  ok   재고 차감
+  ok   금액 다르면 거부
+  ok   카드 거절은 402
+  ok   결제 승인
+  ok   결제 완료
+  ok   같은 승인 다시 (새로고침)
+  ok   파트너 주문 목록
+  ok   업체 몫 금액만 보임
+  ok   택배사 없이 발송 거부
+  ok   발송 처리
+  ok   비회원 주문 조회
+  ok   주문 상태 발송
+  ok   배송 조회 주소
+  ok   틀린 연락처 거부
+  ok   발송된 주문 취소 거부
+  ok   배송 완료
+== 주문 (무통장 → 입금 확인 → 취소·환불)
+  ok   수수료·입금 계좌 설정
+  ok   무통장 주문
+  ok   입금 계좌 안내
+  ok   마이페이지 주문
+  ok   입금 확인
+  ok   결제 완료
+  ok   운영자 취소
+  ok   무통장은 직접 환불 안내
+  ok   취소하면 재고 복원
+== 주문 (토스 결제 후 운영자 취소 → 자동 환불, 결제 전 고객 취소)
+  ok   카드 주문
+  ok   카드 결제
+  ok   카드 결제 취소
+  ok   환불됨
+  ok   결제 전 주문
+  ok   재고 0 → 품절
+  ok   결제 전 고객 취소
+  ok   취소 → 다시 판매 중
+== 방문 장착 주문
+  ok   방문 장착 주문
+  ok   예약 함께 생성
+  ok   방문 시간 없으면 거부
+== 정산
+  ok   파트너 정산
+  ok   이번 달 매출(배송 완료 2만 원)
+  ok   운영자 정산
+  ok   이번 달 지급 처리 거부
+== 업체 정보 변경 요청
+  ok   변경 요청
+  ok   승인 업체는 요청으로 남음
+  ok   심사 중 중복 요청 거부
+  ok   변경 승인
+  ok   상호 반영
+  ok   분야 반영
+== 이미지
+  ok   이미지 올리기
+  ok   이미지 열기
+  ok   이미지 아닌 파일 거부
+  ok   로그인 없이 업로드 거부
+  ok   업체 사진 등록
+  ok   대표 사진 자동 지정
+== 고객센터·신고·공지
+  ok   비회원 문의
+  ok   비밀 링크 48자
+  ok   틀린 링크 거부
+  ok   링크로 확인
+  ok   운영자 답변
+  ok   이어서 묻기
+  ok   다시 답변 대기
+  ok   봇 칸 채우면 조용히 무시
+  ok   리뷰 신고
+  ok   파트너 문의
+  ok   운영자 문의함
+  ok   신고 탭 숫자
+  ok   공지 작성
+  ok   고객 공지 보임
+  ok   고객 공지는 파트너에게 안 보임
+== 운영자 회원 관리·작업 기록·대시보드
+  ok   회원 검색
+  ok   목록은 연락처 가림
+  ok   정지 사유 필요
+  ok   회원 정지
+  ok   정지하면 바로 로그아웃
+  ok   정지 계정 로그인 거부
+  ok   정지 해제
+  ok   작업 기록
+  ok   기록 쌓임
+  ok   대시보드
+  ok   승인 업체 수
+  ok   운영자 카테고리
+  ok   쓰는 카테고리 삭제 거부
+  ok   예전 파트너 키 발급
+  ok   파트너 키로 접속
+  ok   사이트맵
+  ok   사이트맵에 업체
+== 비밀번호 재설정·로그인 잠금·탈퇴
+  ok   재설정 요청
+  ok   비밀번호 재설정
+  ok   새 비밀번호로 로그인
+  ok   5번 틀리면 잠금
+  ok   다가오는 예약 있으면 탈퇴 거부
+  ok   탈퇴
+  ok   탈퇴 뒤 로그아웃
+  ok   같은 이메일 재가입
+
+통과 200 · 실패 1
+----- API 로그 (마지막 80줄) -----
+2026-10-23T22:15:32.995930Z  WARN gageyo_core::state: DATA_KEY 가 없어 DATABASE_URL 에서 암호화 키를 만듭니다 — 운영에서는 DATA_KEY 를 설정하세요
+2026-10-23T22:15:32.996095Z  INFO gageyo_core::mail: 메일: SMTP_URL 이 없어 메일을 보내지 않습니다 (로그에만 기록)
+2026-10-23T22:15:33.003811Z  INFO gageyo_api: gageyo API is listening bind=127.0.0.1:18081
+2026-10-23T22:15:33.884511Z  WARN gageyo_api::accounts: 메일 설정이 없어 비밀번호 설정 링크를 로그에만 남깁니다 link=https://admin.gageyo.com/?reset=1602463a577970b62dda8230818d144d8e92a19acaa3bb13734bf2aa1d5e9351
+2026-10-23T22:15:33.884606Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요] 비밀번호 설정 안내
+2026-10-23T22:16:08.653115Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요 운영] 새 입점 신청 · 역삼 모터스
+2026-10-23T22:16:09.252453Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 입점이 승인되었습니다
+2026-10-23T22:16:11.153842Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 견적 요청 · 자동차 정비
+2026-10-23T22:16:11.197493Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 역삼 모터스에서 견적이 도착했습니다
+2026-10-23T22:16:11.275304Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 고객이 견적을 선택했습니다
+2026-10-23T22:16:11.358164Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 예약 요청 · 2026-10-26 10:00
+2026-10-23T22:16:11.386586Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 작업이 완료되었습니다
+2026-10-23T22:16:11.425429Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 후기 ★5
+2026-10-23T22:16:11.525098Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 예약 요청 · 2026-10-26 11:00
+2026-10-23T22:16:11.569779Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 고객이 예약을 취소했습니다
+2026-10-23T22:16:11.603285Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=g***@gageyo.test subject=[가게요] 주문이 접수되었습니다 (#AE6FE3F8)
+2026-10-23T22:16:11.636973Z  WARN gageyo_commerce::payments: toss amount mismatch order_id=ae6fe3f8-d269-470e-99df-635c161ebc4f expected=20000 got=19000
+2026-10-23T22:16:11.646923Z  WARN gageyo_core::toss: toss confirm rejected order_id="ae6fe3f8-d269-470e-99df-635c161ebc4f" http=400 Bad Request code=Some("REJECT_CARD_COMPANY")
+2026-10-23T22:16:11.660180Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=g***@gageyo.test subject=[가게요] 결제가 완료되었습니다 (#AE6FE3F8)
+2026-10-23T22:16:11.661314Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 주문 1건 · 역삼 모터스
+2026-10-23T22:16:11.719988Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=g***@gageyo.test subject=[가게요] 상품이 발송되었습니다 (#AE6FE3F8)
+2026-10-23T22:16:11.797303Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 접수되었습니다 (#E1942FF6)
+2026-10-23T22:16:11.832598Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 결제가 완료되었습니다 (#E1942FF6)
+2026-10-23T22:16:11.833351Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 주문 1건 · 역삼 모터스
+2026-10-23T22:16:11.862762Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 취소되고 결제가 환불 처리되었습니다 (#E1942FF6)
+2026-10-23T22:16:11.863760Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 주문 취소 (#E1942FF6)
+2026-10-23T22:16:11.895903Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 접수되었습니다 (#EF9D64D9)
+2026-10-23T22:16:11.915015Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 결제가 완료되었습니다 (#EF9D64D9)
+2026-10-23T22:16:11.916136Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 주문 1건 · 역삼 모터스
+2026-10-23T22:16:11.935873Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 취소되고 결제가 환불 처리되었습니다 (#EF9D64D9)
+2026-10-23T22:16:11.936878Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 주문 취소 (#EF9D64D9)
+2026-10-23T22:16:11.953591Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 접수되었습니다 (#E34486E1)
+2026-10-23T22:16:11.985410Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 취소되었습니다 (#E34486E1)
+2026-10-23T22:16:11.986092Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 주문 취소 (#E34486E1)
+2026-10-23T22:16:12.016476Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 주문이 접수되었습니다 (#E6B9F5D3)
+2026-10-23T22:16:12.086841Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요 운영] 업체 정보 변경 요청 · 역삼 모터스
+2026-10-23T22:16:12.124695Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 업체 정보 변경 요청 결과
+2026-10-23T22:16:12.245831Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요 운영] 새 고객 문의: 환불 문의
+2026-10-23T22:16:12.245904Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=g***@gageyo.test subject=[가게요] 문의가 접수되었습니다: 환불 문의
+2026-10-23T22:16:12.285294Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=g***@gageyo.test subject=[가게요] 문의에 답변이 등록되었습니다: 환불 문의
+2026-10-23T22:16:12.297043Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요 운영] 새 고객 문의: 환불 문의
+2026-10-23T22:16:12.321810Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요 운영] 새 신고: 리뷰 신고: 친절하고 꼼꼼해요
+2026-10-23T22:16:12.334502Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=o***@gageyo.test subject=[가게요 운영] 새 파트너 문의: 정산 문의
+2026-10-23T22:16:13.073408Z  WARN gageyo_api::accounts: 메일 설정이 없어 비밀번호 설정 링크를 로그에만 남깁니다 link=https://app.gageyo.com/?reset=bb846dacc1bc8768fe9b7661facfe42aeaf990bbf4b598ac2baef212cc0861d1
+2026-10-23T22:16:13.073521Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=d***@gageyo.test subject=[가게요] 비밀번호 설정 안내
+2026-10-23T22:16:18.285581Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 고객이 예약을 취소했습니다
