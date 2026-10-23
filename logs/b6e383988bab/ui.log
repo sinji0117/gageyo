@@ -1,0 +1,41 @@
+ok   고객 첫 화면
+ok   업체 상세
+ok   예약 창
+ok   상품·장바구니·주문서
+ok   견적 요청 창
+ok   고객 로그인·마이페이지
+ok   받은 견적 비교
+ok   고객 화면 휴대폰
+ok   파트너 입점 신청 화면
+ok   파트너 로그인·대시보드
+ok   파트너 견적 요청
+ok   파트너 예약 일정
+ok   파트너 상품
+ok   파트너 주문·배송
+ok   파트너 업체 정보
+ok   파트너 정산
+ok   파트너 견적 보내기 창
+ok   운영자 로그인 화면
+ok   운영자 API 키 접속·대시보드
+ok   운영자 업체 관리
+ok   운영자 회원 관리
+ok   운영자 주문
+ok   운영자 문의·신고
+ok   운영자 결제·운영 설정
+ok   운영자 카테고리
+ok   운영자 작업 기록
+FAIL 운영자 업체 상세: locator.click: Error: strict mode violation: getByRole('tab', { name: '승인' }) resolved to 2 elements:
+ok   소개 페이지
+
+자바스크립트 오류 없음
+2026-10-23T22:47:22.048704Z  WARN gageyo_core::state: DATA_KEY 가 없어 DATABASE_URL 에서 암호화 키를 만듭니다 — 운영에서는 DATA_KEY 를 설정하세요
+2026-10-23T22:47:22.048836Z  INFO gageyo_core::mail: 메일: SMTP_URL 이 없어 메일을 보내지 않습니다 (로그에만 기록)
+2026-10-23T22:47:22.057522Z  INFO gageyo_api: gageyo API is listening bind=127.0.0.1:8081
+2026-10-23T22:47:23.560117Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=u***@gageyo.test subject=[가게요 운영] 새 입점 신청 · 스모크 모터스
+2026-10-23T22:47:23.576144Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=u***@gageyo.test subject=[가게요] 입점이 승인되었습니다
+2026-10-23T22:47:24.159161Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=u***@gageyo.test subject=[가게요] 새 견적 요청 · 자동차 정비
+2026-10-23T22:47:24.159234Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=s***@gageyo.test subject=[가게요] 새 견적 요청 · 자동차 정비
+2026-10-23T22:47:24.171053Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=u***@gageyo.test subject=[가게요] 스모크 모터스에서 견적이 도착했습니다
+2026-10-23T22:47:24.182941Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=u***@gageyo.test subject=[가게요] 새 견적 요청 · 디테일링세차/광택
+2026-10-23T22:47:24.202692Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=u***@gageyo.test subject=[가게요 운영] 새 고객 문의: 예약 변경 문의
+2026-10-23T22:47:24.202755Z  INFO gageyo_core::mail: 메일(미설정, 보내지 않음) to=g***@gageyo.test subject=[가게요] 문의가 접수되었습니다: 예약 변경 문의
