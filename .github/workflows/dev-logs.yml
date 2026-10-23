@@ -38,6 +38,11 @@ jobs:
             export DATABASE_URL=mysql://gageyo_user:devpass@127.0.0.1:3306/gageyo_db
             bash scripts/e2e.sh > /tmp/logs/e2e.log 2>&1; echo "e2e: $?" >> /tmp/logs/summary.txt
           fi
+          if [ -x scripts/ui-smoke.sh ]; then
+            npm install --prefix /tmp/pw --no-audit --no-fund playwright-core@1.48.2 > /tmp/logs/pw-install.log 2>&1
+            export DATABASE_URL=mysql://gageyo_user:devpass@127.0.0.1:3306/gageyo_db
+            NODE_PATH=/tmp/pw/node_modules OUT=/tmp/logs/shots CHROME=$(which google-chrome || which chromium) bash scripts/ui-smoke.sh > /tmp/logs/ui.log 2>&1; echo "ui: $?" >> /tmp/logs/summary.txt
+          fi
           cat /tmp/logs/summary.txt
       - name: publish logs
         if: always()
@@ -46,5 +51,5 @@ jobs:
           git config user.name ci-logs; git config user.email ci-logs@users.noreply.github.com
           git fetch origin ci-logs:ci-logs 2>/dev/null && git checkout ci-logs || git checkout --orphan ci-logs
           git rm -rq --cached . 2>/dev/null || true
-          mkdir -p logs/$sha && cp /tmp/logs/* logs/$sha/ 2>/dev/null || true
+          mkdir -p logs/$sha && cp -r /tmp/logs/* logs/$sha/ 2>/dev/null || true
           git add -f logs/$sha && git commit -qm "logs $sha" && git push -q origin ci-logs
