@@ -3,3 +3,4 @@ cargo build: 0
 cargo test: 0
 frontend: 0
 e2e: 0
+ui: 1
