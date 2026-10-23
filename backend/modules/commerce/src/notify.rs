@@ -129,3 +129,14 @@ pub async fn order_cancelled(s: &AppState, order_id: &str, refunded: bool, reaso
         s.mailer.send(Mail::new(e, format!("[가게요] 주문 취소 (#{})", short(order_id)), "주문이 취소되었습니다. 준비 중이던 상품은 보내지 마세요.".to_string()));
     }
 }
+
+/// 결제 기한이 지나 자동 취소 (결제 전이라 업체에는 알리지 않음)
+pub async fn order_expired(s: &AppState, order_id: &str, reason: &str) {
+    if let Some(to) = order_email(s, order_id).await {
+        s.mailer.send(Mail::new(
+            to,
+            format!("[가게요] 주문이 취소되었습니다 (#{})", short(order_id)),
+            format!("주문(#{})이 {reason}되었습니다. 필요하면 다시 주문해 주세요.\n{}/?request=cart", short(order_id), s.cfg.app_url),
+        ));
+    }
+}

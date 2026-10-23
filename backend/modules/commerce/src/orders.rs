@@ -489,7 +489,7 @@ async fn customer_cancel(
     if !can_access(&o, user.as_ref(), b.phone.as_deref()) {
         return Err(AppError::Forbidden("주문할 때 적은 연락처를 입력해 주세요".into()));
     }
-    if o.status != "payment_pending" {
+    if o.status != "payment_pending" || crate::payments::sync_toss(&s, &o).await? {
         return Err(AppError::Conflict("결제가 끝난 주문은 고객센터로 취소를 요청해 주세요".into()));
     }
     let reason = opt_text(b.reason.as_deref(), "취소 사유", 300)?.unwrap_or_else(|| "고객 취소".into());
@@ -537,6 +537,58 @@ pub async fn cancel_in_db(s: &AppState, order_id: &str, final_status: &str, reas
         .await?;
     tx.commit().await?;
     Ok(())
+}
+
+/// 카드 결제창을 닫고 떠난 주문을 자동 취소하기까지 (결제창 승인 유효 시간보다 넉넉히)
+pub const CARD_PAY_EXPIRE_HOURS: u32 = 2;
+/// 무통장 입금 기한이 지난 뒤 자동 취소까지 더 기다리는 시간 (늦은 입금 확인용)
+pub const BANK_GRACE_HOURS: u32 = 24;
+
+/// 결제하지 않은 주문을 자동 취소하고 재고·방문 예약을 되돌립니다. API 정리 작업이 한 시간마다 부릅니다.
+///
+/// - 카드: 주문 뒤 `CARD_PAY_EXPIRE_HOURS` 시간 동안 승인이 없으면 (먼저 토스에서 주문번호로 결제를 찾아, 승인돼 있으면 결제 완료로)
+/// - 무통장: 입금 기한(운영 설정, 기본 48시간) + `BANK_GRACE_HOURS` 시간이 지나도 입금 확인이 없으면
+/// - 결제 수단 없이 접수한 주문(`none`)은 업체와 직접 결제하므로 건드리지 않습니다.
+///
+/// 돌려주는 값: 취소한 주문 수
+pub async fn expire_unpaid(s: &AppState) -> AppResult<usize> {
+    let due: u32 = settings::get(s, settings::BANK_DUE_HOURS).await?.and_then(|v| v.parse().ok()).unwrap_or(48);
+    let rows: Vec<(String, String)> = sqlx::query_as(
+        "SELECT id, payment_method FROM orders WHERE status = 'payment_pending' AND ( \
+           (payment_method = 'toss' AND created_at < NOW() - INTERVAL ? HOUR) OR \
+           (payment_method = 'bank' AND created_at < NOW() - INTERVAL ? HOUR)) LIMIT 200",
+    )
+    .bind(CARD_PAY_EXPIRE_HOURS)
+    .bind(due + BANK_GRACE_HOURS)
+    .fetch_all(&s.db)
+    .await?;
+    let mut n = 0;
+    for (id, method) in rows {
+        if method == "toss" {
+            // 토스에는 승인됐는데 우리 쪽 승인 처리가 끊긴 주문이면 취소하지 않고 결제 완료로 맞춤
+            let o = load_order(s, &id).await?;
+            match crate::payments::sync_toss(s, &o).await {
+                Ok(true) => continue,
+                Ok(false) => {}
+                // 결제사 확인이 안 되면 이번에는 건너뜀 (다음 정리 때 다시)
+                Err(_) => continue,
+            }
+        }
+        let reason = if method == "bank" { "입금 기한이 지나 자동 취소" } else { "결제가 완료되지 않아 자동 취소" };
+        match cancel_in_db(s, &id, "cancelled", reason).await {
+            Ok(()) => {
+                n += 1;
+                crate::notify::order_expired(s, &id, reason).await;
+            }
+            // 그사이 결제·취소된 주문
+            Err(AppError::Conflict(_)) => {}
+            Err(e) => tracing::warn!(order_id = %id, error = %e, "expire unpaid order failed"),
+        }
+    }
+    if n > 0 {
+        tracing::info!(count = n, "unpaid orders expired");
+    }
+    Ok(n)
 }
 
 #[cfg(test)]

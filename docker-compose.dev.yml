@@ -1,3 +1,4 @@
+# 로컬 개발용 MariaDB. 가게요는 Redis 를 쓰지 않습니다 (세션·인증 코드·요청 제한 모두 MariaDB).
 services:
   mariadb:
     image: mariadb:10.11
@@ -9,9 +10,5 @@ services:
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
     ports: ["127.0.0.1:3306:3306"]
     volumes: [mariadb:/var/lib/mysql]
-  redis:
-    image: redis:7
-    command: ["redis-server", "--requirepass", "devpass", "--maxmemory-policy", "volatile-lru"]
-    ports: ["127.0.0.1:6379:6379"]
 volumes:
   mariadb:

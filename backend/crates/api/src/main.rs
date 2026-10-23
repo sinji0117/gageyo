@@ -75,7 +75,7 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-/// 한 시간마다 만료된 세션·인증 코드·요청 횟수 기록 정리
+/// 한 시간마다 만료된 세션·인증 코드·요청 횟수 기록 정리, 결제 기한 지난 주문 자동 취소
 fn spawn_cleanup(state: AppState) {
     tokio::spawn(async move {
         let mut tick = tokio::time::interval(Duration::from_secs(3600));
@@ -86,6 +86,9 @@ fn spawn_cleanup(state: AppState) {
             let _ = sqlx::query("DELETE FROM auth_sessions WHERE expires_at < NOW()").execute(db).await;
             let _ = sqlx::query("DELETE FROM email_codes WHERE expires_at < NOW() - INTERVAL 1 DAY").execute(db).await;
             let _ = sqlx::query("DELETE FROM password_resets WHERE expires_at < NOW() - INTERVAL 7 DAY").execute(db).await;
+            if let Err(e) = gageyo_commerce::orders::expire_unpaid(&state).await {
+                tracing::warn!(error = %e, "expire unpaid orders");
+            }
         }
     });
 }

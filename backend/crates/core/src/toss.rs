@@ -5,6 +5,7 @@
 //! 2. 결제 성공 시 `successUrl?paymentKey=&orderId=&amount=` 로 돌아옴
 //! 3. 서버가 금액을 주문과 대조한 뒤 `POST /v1/payments/confirm` 호출 (Authorization: Basic base64("{secretKey}:"))
 //! 4. 환불은 `POST /v1/payments/{paymentKey}/cancel` (Idempotency-Key 헤더로 중복 방지)
+//! 5. 승인 결과를 모를 때는 `GET /v1/payments/orders/{orderId}` 로 주문번호의 결제를 찾습니다
 //!
 //! API 주소는 `TOSS_API_BASE` 로 바꿀 수 있습니다 (테스트에서는 로컬 모의 서버).
 
@@ -39,6 +40,8 @@ pub struct Confirmed {
 #[serde(rename_all = "camelCase")]
 struct TossPayment {
     status: String,
+    #[serde(default)]
+    payment_key: Option<String>,
     total_amount: u64,
     #[serde(default)]
     method: Option<String>,
@@ -113,6 +116,37 @@ impl TossClient {
             return Err(TossError::Transport(format!("결제 조회 실패 ({status})")));
         }
         parse_done(&body)
+    }
+
+    /// 주문번호로 결제를 찾습니다. 승인 완료(`DONE`)면 (결제 키, 승인 정보), 결제가 없거나 다른 상태면 `None`.
+    /// 승인 요청이 중간에 끊겨 결과를 모를 때, 결제하지 않은 주문을 취소하기 전에 씁니다.
+    pub async fn find_by_order(&self, secret_key: &str, order_id: &str) -> Result<Option<(String, Confirmed)>, TossError> {
+        if !safe_key(order_id) {
+            return Ok(None);
+        }
+        let res = self
+            .http
+            .get(format!("{}/v1/payments/orders/{order_id}", self.base))
+            .basic_auth(secret_key, Some(""))
+            .send()
+            .await
+            .map_err(|e| TossError::Transport(e.to_string()))?;
+        let status = res.status();
+        let body = res.text().await.map_err(|e| TossError::Transport(e.to_string()))?;
+        if status == reqwest::StatusCode::NOT_FOUND {
+            return Ok(None);
+        }
+        if !status.is_success() {
+            return Err(TossError::Transport(format!("결제 조회 실패 ({status})")));
+        }
+        let p: TossPayment = serde_json::from_str(&body).map_err(|e| TossError::Transport(format!("응답 해석 실패: {e}")))?;
+        let Some(key) = p.payment_key.clone().filter(|k| !k.is_empty()) else {
+            return Ok(None);
+        };
+        if p.status != "DONE" {
+            return Ok(None);
+        }
+        Ok(Some((key, parse_done(&body)?)))
     }
 
     pub async fn cancel(&self, secret_key: &str, payment_key: &str, reason: &str, idempotency_key: &str) -> Result<String, TossError> {

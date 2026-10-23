@@ -15,3 +15,4 @@ export {
   DAY_NAMES,
 } from "./format.js";
 export { useToast, useLoad, Modal, Badge, Empty, Loading, ErrorBox, Field, ImageInput, Tabs, CodeButton } from "./components.jsx";
+export { AddressInput, loadPostcode, fromPostcode } from "./address.jsx";

@@ -124,6 +124,11 @@ function OrderDetail({ id, onClose, onChanged, toast }) {
       (r) => (r.manual_refund_needed ? "취소했습니다. 무통장 입금액은 고객 계좌로 직접 돌려주세요." : r.status === "refunded" ? "취소하고 환불했습니다." : "취소했습니다."),
     );
   };
+  const tossSync = () =>
+    act(
+      () => aapi(`/admin/orders/${id}/toss-sync`, { method: "POST" }),
+      (r) => (r.paid ? "토스에 승인된 결제가 있어 결제 완료로 맞췄습니다." : "토스에 승인된 결제가 없습니다. 고객이 결제하지 않았습니다."),
+    );
   const markPaid = () => {
     if (!window.confirm("업체와 직접 결제한 주문을 결제 완료로 바꿀까요?")) return;
     act(() => aapi(`/admin/orders/${id}`, { method: "PATCH", body: { status: "paid" } }), () => "결제 완료로 바꿨습니다.");
@@ -140,6 +145,11 @@ function OrderDetail({ id, onClose, onChanged, toast }) {
             {o.status === "payment_pending" && o.payment_method === "bank" && (
               <button type="button" className="gy-button small" onClick={confirmDeposit}>
                 입금 확인
+              </button>
+            )}
+            {o.status === "payment_pending" && o.payment_method === "toss" && (
+              <button type="button" className="gy-button ghost small" onClick={tossSync} title="결제창 승인 뒤 화면이 끊긴 주문을 토스에서 찾아 맞춥니다">
+                카드 결제 확인
               </button>
             )}
             {o.status === "payment_pending" && o.payment_method === "none" && (

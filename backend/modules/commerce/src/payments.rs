@@ -12,6 +12,45 @@ pub fn routes() -> Router<AppState> {
     Router::new().route("/orders/{id}/payments/toss", post(confirm_toss))
 }
 
+/// 결제 대기 중인 카드 주문을 토스에서 찾아, 이미 승인된 결제면 결제 완료로 맞춥니다.
+/// (승인 요청이 통신 오류로 끊긴 경우, 고객이 결제창에서 돌아오지 못한 경우)
+///
+/// 돌려주는 값: 결제 완료로 바꿨으면 `true`. 토스 설정이 없거나 카드 결제 대기 주문이 아니면 `false`.
+/// 토스와 통신하지 못하면 오류 — 결과를 모르는 채로 주문을 취소하면 안 되기 때문입니다.
+pub async fn sync_toss(s: &AppState, o: &crate::orders::OrderRow) -> AppResult<bool> {
+    if o.payment_method != "toss" || o.status != "payment_pending" {
+        return Ok(false);
+    }
+    let Some(secret) = s.cfg.toss_secret_key.clone() else {
+        return Ok(false);
+    };
+    let found = match s.toss.find_by_order(&secret, &o.id).await {
+        Ok(f) => f,
+        Err(TossError::Rejected(m)) | Err(TossError::Transport(m)) => {
+            tracing::warn!(order_id = %o.id, error = %m, "toss lookup failed");
+            return Err(AppError::Unavailable("결제사에 결제 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요".into()));
+        }
+    };
+    let Some((key, c)) = found else { return Ok(false) };
+    if c.approved_amount != o.total_amount {
+        tracing::error!(order_id = %o.id, approved = c.approved_amount, "toss lookup amount mismatch — 토스 상점관리자에서 확인 필요");
+        return Err(AppError::Conflict("토스에 승인된 금액이 주문 금액과 다릅니다. 토스 상점관리자에서 확인해 주세요".into()));
+    }
+    let detail = match &c.easy_pay_provider {
+        Some(p) => format!("{} ({p})", c.method),
+        None => c.method.clone(),
+    };
+    match mark_paid(s, &o.id, Some(&key), &detail).await {
+        Ok(()) => {
+            tracing::info!(order_id = %o.id, "toss payment found and marked paid");
+            crate::notify::order_paid(s, &o.id).await;
+            Ok(true)
+        }
+        Err(AppError::Conflict(_)) => Ok(false),
+        Err(e) => Err(e),
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct TossConfirmInput {
     pub payment_key: String,

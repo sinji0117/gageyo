@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, Field, Badge, ImageInput, Empty, useLoad, dateText, DAY_NAMES, timeText } from "@gageyo/ui";
+import { api, Field, Badge, ImageInput, Empty, useLoad, dateText, DAY_NAMES, timeText, AddressInput } from "@gageyo/ui";
 import { usePartner } from "../context.js";
 import { papi } from "../papi.js";
 
@@ -198,7 +198,12 @@ export default function Profile() {
               <input required value={core.district} onChange={(e) => setCore({ ...core, district: e.target.value })} />
             </Field>
             <Field label="주소" required>
-              <input required value={core.address} onChange={(e) => setCore({ ...core, address: e.target.value })} />
+              <AddressInput
+                required
+                value={core.address}
+                onChange={(v) => setCore((c) => ({ ...c, address: v }))}
+                onPick={(r) => r.sigungu && setCore((c) => ({ ...c, district: r.sigungu }))}
+              />
             </Field>
           </div>
           <div className="gy-row">

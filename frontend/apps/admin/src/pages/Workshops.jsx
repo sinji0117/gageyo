@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, Modal, Field, Badge, Empty, Loading, ErrorBox, Tabs, useLoad, dateText, dateTimeText, qs, hoursText, timeText, DAY_NAMES } from "@gageyo/ui";
+import { api, Modal, Field, Badge, Empty, Loading, ErrorBox, Tabs, useLoad, dateText, dateTimeText, qs, hoursText, timeText, DAY_NAMES, AddressInput } from "@gageyo/ui";
 import { useAdmin } from "../context.js";
 import { aapi } from "../aapi.js";
 
@@ -365,7 +365,12 @@ function WorkshopForm({ initial = null, inline = false, onClose, onSaved }) {
           <input required value={form.district} onChange={set("district")} />
         </Field>
         <Field label="주소" required>
-          <input required value={form.address} onChange={set("address")} />
+          <AddressInput
+            required
+            value={form.address}
+            onChange={(v) => setForm((f) => ({ ...f, address: v }))}
+            onPick={(r) => r.sigungu && setForm((f) => ({ ...f, district: r.sigungu }))}
+          />
         </Field>
       </div>
       <div className="gy-row">

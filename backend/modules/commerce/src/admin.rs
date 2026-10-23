@@ -1,4 +1,4 @@
-//! 운영자 주문 관리: 목록·상세, 무통장 입금 확인, 취소·환불, (결제 수단 없는 주문의) 상태 직접 변경.
+//! 운영자 주문 관리: 목록·상세, 무통장 입금 확인, 카드 결제 확인(토스 조회), 취소·환불, (결제 수단 없는 주문의) 상태 직접 변경.
 
 use axum::{
     extract::{Path, Query, State},
@@ -21,6 +21,7 @@ pub fn routes() -> Router<AppState> {
         .route("/admin/orders/{id}", get(order_detail).patch(set_status))
         .route("/admin/orders/{id}/confirm-deposit", post(confirm_deposit))
         .route("/admin/orders/{id}/cancel", post(cancel_order))
+        .route("/admin/orders/{id}/toss-sync", post(toss_sync))
 }
 
 #[derive(Debug, Deserialize)]
@@ -90,6 +91,22 @@ async fn confirm_deposit(State(s): State<AppState>, admin: Admin, Path(id): Path
     Ok(StatusCode::NO_CONTENT)
 }
 
+/// 카드 결제 확인: 결제 대기 중인 카드 주문을 토스에서 주문번호로 찾아, 승인돼 있으면 결제 완료로 맞춥니다.
+async fn toss_sync(State(s): State<AppState>, admin: Admin, Path(id): Path<String>) -> AppResult<Json<serde_json::Value>> {
+    let o = crate::orders::load_order(&s, &id).await?;
+    if o.payment_method != "toss" || o.status != "payment_pending" {
+        return Err(AppError::bad("결제 대기 중인 카드 결제 주문이 아닙니다"));
+    }
+    if s.cfg.toss_secret_key.is_none() {
+        return Err(AppError::Unavailable("카드 결제 설정(TOSS_SECRET_KEY)이 없습니다".into()));
+    }
+    let paid = crate::payments::sync_toss(&s, &o).await?;
+    if paid {
+        audit::log(&s, &admin, "order.toss_synced", "order", &id, Some(format!("{}원", o.total_amount))).await;
+    }
+    Ok(Json(serde_json::json!({ "paid": paid })))
+}
+
 #[derive(Debug, Deserialize)]
 pub struct CancelInput {
     pub reason: Option<String>,
@@ -109,6 +126,8 @@ async fn cancel_order(State(s): State<AppState>, admin: Admin, Path(id): Path<St
     if shipped > 0 {
         return Err(AppError::Conflict("이미 발송된 상품이 있어 주문 전체를 취소할 수 없습니다. 반품은 업체와 협의해 처리해 주세요".into()));
     }
+    // 결제 대기로 보이는 카드 주문도 토스에는 승인됐을 수 있으므로 먼저 확인 (그렇다면 환불까지 진행)
+    let o = if crate::payments::sync_toss(&s, &o).await? { crate::orders::load_order(&s, &id).await? } else { o };
     let final_status = crate::payments::refund(&s, &o, &reason).await?;
     crate::orders::cancel_in_db(&s, &id, final_status, &reason).await?;
     audit::log(&s, &admin, &format!("order.{final_status}"), "order", &id, Some(reason.clone())).await;

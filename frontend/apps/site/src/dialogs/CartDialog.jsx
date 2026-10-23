@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, money, Modal, Field, Empty, todayIso, toLocalIso, statusLabel } from "@gageyo/ui";
+import { api, money, Modal, Field, Empty, todayIso, toLocalIso, statusLabel, AddressInput } from "@gageyo/ui";
 import { useApp } from "../context.js";
 import { Cover } from "../components/WorkshopCard.jsx";
 import { requestTossPayment, rememberOrderPhone } from "../toss.js";
@@ -156,7 +156,7 @@ export default function CartDialog() {
         </Field>
         {form.fulfillment === "delivery" ? (
           <Field label="배송 주소" required>
-            <input required maxLength={500} value={form.address} onChange={set("address")} placeholder="도로명 주소와 상세 주소" autoComplete="street-address" />
+            <AddressInput required maxLength={500} value={form.address} onChange={(v) => setForm((f) => ({ ...f, address: v }))} autoComplete="street-address" />
           </Field>
         ) : (
           <>

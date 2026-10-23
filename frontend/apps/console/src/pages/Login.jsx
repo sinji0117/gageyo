@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, Field, CodeButton } from "@gageyo/ui";
+import { api, Field, CodeButton, AddressInput } from "@gageyo/ui";
 import { usePartner } from "../context.js";
 import { setLegacyKey } from "../papi.js";
 
@@ -303,7 +303,12 @@ export default function Login({ resetToken, onLoggedIn }) {
                   <input required maxLength={100} value={apply.district} onChange={setA("district")} />
                 </Field>
                 <Field label="주소" required>
-                  <input required maxLength={255} value={apply.address} onChange={setA("address")} />
+                  <AddressInput
+                    required
+                    value={apply.address}
+                    onChange={(v) => setApply((a) => ({ ...a, address: v }))}
+                    onPick={(r) => r.sigungu && setApply((a) => ({ ...a, district: r.sigungu }))}
+                  />
                 </Field>
               </div>
               <div className="gy-row">

@@ -304,6 +304,29 @@ call GET /partner/products ptn ""; is "재고 0 → 품절" "$(j "[.[] | select(
 call POST "/orders/$POID/cancel" cus '{}'; expect "결제 전 고객 취소" 204
 call GET /partner/products ptn ""; is "취소 → 다시 판매 중" "$(j "[.[] | select(.id==\"$PID\")][0].status")" active
 
+echo "== 카드 승인 결과를 모를 때 (토스에서 주문번호로 찾아 맞춤)"
+toss_approve() { # 우리 API 를 거치지 않고 토스(모의)에서만 승인된 상황
+  curl -s -o /dev/null -u test_sk_x: -H 'Content-Type: application/json' \
+    --data "{\"paymentKey\":\"$2\",\"orderId\":\"$1\",\"amount\":8000}" "http://127.0.0.1:$TOSS_PORT/v1/payments/confirm"
+}
+call POST /orders cus "{\"customer_name\":\"이운전\",\"customer_phone\":\"010-4444-5555\",\"address\":\"서울\",\"items\":[{\"product_id\":\"$PID2\",\"quantity\":1}]}"
+expect "카드 주문" 201
+LOID=$(j .id)
+admin POST "/admin/orders/$LOID/toss-sync" ""; expect "카드 결제 확인" 200
+is "토스에 결제 없음" "$(j .paid)" false
+toss_approve "$LOID" pay_e2e_lost
+admin POST "/admin/orders/$LOID/toss-sync" ""; expect "카드 결제 확인 (승인됨)" 200
+is "결제 완료로 맞춤" "$(j .paid)" true
+call GET "/me/orders/$LOID" cus ""; is "주문 결제 완료" "$(j .status)" paid
+admin POST "/admin/orders/$LOID/cancel" '{"reason":"검사"}'; is "정리(환불)" "$(j .status)" refunded
+call POST /orders cus "{\"customer_name\":\"이운전\",\"customer_phone\":\"010-4444-5555\",\"address\":\"서울\",\"items\":[{\"product_id\":\"$PID2\",\"quantity\":1}]}"
+expect "카드 주문" 201
+LOID2=$(j .id)
+toss_approve "$LOID2" pay_e2e_lost2
+call POST "/orders/$LOID2/cancel" cus '{}'; expect "토스에 승인된 주문은 고객 취소 거부" 409
+call GET "/me/orders/$LOID2" cus ""; is "결제 완료로 맞춤" "$(j .status)" paid
+admin POST "/admin/orders/$LOID2/cancel" '{"reason":"검사"}'; is "정리(환불)" "$(j .status)" refunded
+
 echo "== 방문 장착 주문"
 call POST /orders cus "{\"customer_name\":\"이운전\",\"customer_phone\":\"010-4444-5555\",\"fulfillment\":\"visit\",\"vehicle\":\"아반떼\",\"visit_at\":\"${DAY2}T15:00:00\",\"items\":[{\"product_id\":\"$PID\",\"quantity\":1}]}"
 expect "방문 장착 주문" 201
