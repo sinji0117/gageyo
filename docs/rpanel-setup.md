@@ -1,174 +1,128 @@
-# Rpanel에 gageyo 배포하기
+[← 문서 목차](README.md)
 
-이 문서는 GitHub 저장소 `sinji0117/gageyo`를 Rpanel의 **프로젝트**로 연결해 API와 웹 화면을 배포하는 순서입니다. gageyo는 한 저장소 안에 Rust API와 네 개의 React/Vite 앱이 있습니다. 따라서 Rpanel 프로젝트 하나에 백엔드 앱 하나와 정적 프런트엔드 앱 네 개를 등록합니다.
+# Rpanel 에 gageyo 배포하기
 
-> 현재 단계는 배포 가능한 프로젝트 골격입니다. 고객·업체 로그인과 권한 검증, 결제 연동, 운영자 실데이터 화면은 아직 완성되지 않았습니다. 실제 고객 개인정보나 결제 데이터를 받기 전에 [운영 전 확인 사항](#운영-전에-필요한-구현)을 완료하세요.
+GitHub 저장소 `sinji0117/gageyo` 를 Rpanel **프로젝트** 하나로 연결해 API 앱 하나와 정적 화면 앱 네 개를 배포하는 순서입니다.
 
-## 1. 준비하기
+> 처음 올린다면 [첫 배포 체크리스트](first-deploy-checklist.md)를 옆에 두고 따라 하세요.
 
-- Rpanel이 설치된 Ubuntu 서버와 패널 관리자 계정
-- `gageyo` 저장소에 접근할 수 있는 GitHub 계정
-- 서비스에 연결할 도메인과 DNS 관리 권한
-- 충분한 디스크 공간과 MariaDB 백업 위치
+## 1. 준비
 
-Rpanel은 Git 배포에서 저장소를 서버에서 빌드합니다. Rust 릴리스 빌드는 메모리를 사용하므로 서버 여유 메모리를 확인하세요.
+- Rpanel 이 설치된 Ubuntu 서버와 패널 관리자 계정 (Rust 릴리스 빌드에 메모리 4GB 이상 권장)
+- 저장소에 접근할 수 있는 GitHub 계정, 도메인과 DNS 관리 권한
+- (권장) 메일 발송 계정(SMTP), 토스페이먼츠 테스트 키
 
-## 2. DNS를 서버로 연결하기
+## 2. DNS
 
-DNS 관리 화면에서 서비스 도메인마다 서버의 공인 IP를 가리키는 `A` 레코드를 추가합니다. 예를 들면 아래처럼 나눌 수 있습니다.
+DNS 관리 화면에서 아래 호스트를 서버 공인 IP 로 `A` 레코드를 넣습니다.
 
-| 화면 | 예시 도메인 | 용도 |
-|---|---|---|
-| 마케팅 소개 | `gageyo.com` | `frontend/apps/www` |
-| 운전자 서비스 | `app.gageyo.com` | 업체 탐색·견적·예약·상품 |
-| 업체 센터 | `partner.gageyo.com` | 업체 견적·예약·상품 관리 |
-| 플랫폼 운영 | `admin.gageyo.com` | 운영자 화면 |
+| 호스트 | 도메인 | 화면 |
+| --- | --- | --- |
+| `@` | `gageyo.com` | 소개 (`frontend/apps/www`) |
+| `app` | `app.gageyo.com` | 고객 (`frontend/apps/site`) |
+| `partner` | `partner.gageyo.com` | 파트너 센터 (`frontend/apps/console`) |
+| `admin` | `admin.gageyo.com` | 운영자 (`frontend/apps/admin`) |
 
-기본 도메인은 `gageyo.com`입니다. DNS 관리 화면에서 `@`, `app`, `partner`, `admin` 호스트에 서버 공인 IP를 가리키는 A 레코드를 각각 추가하세요. DNS가 전파된 뒤 Rpanel 각 앱의 SSL 탭에서 HTTPS 인증서를 발급합니다.
+## 3. API 앱 만들기
 
-## 3. Rpanel 프로젝트와 API 앱 만들기
-
-1. Rpanel 왼쪽의 **프로젝트**에서 **새 프로젝트**를 만듭니다. 예: `gageyo`.
-2. 프로젝트 안에서 **새 앱**을 만들고 **백엔드 (API 서버)** 역할과 **Rust**를 선택합니다.
-3. Git 저장소 주소와 빌드 항목을 다음처럼 설정합니다.
+Rpanel → **프로젝트** → **새 프로젝트**(`gageyo`) → **새 앱** → **백엔드 (API 서버)** · **Rust**
 
 | 설정 | 값 |
-|---|---|
+| --- | --- |
 | 이름 | `gageyo-api` |
-| Git 저장소 | `git@github.com:sinji0117/gageyo.git` |
+| Git 저장소 | `git@github.com:sinji0117/gageyo.git` (비공개면 SSH + Deploy key, 5단계) |
 | 브랜치 | `main` |
 | 앱 폴더 (Root Directory) | `backend` |
 | 바이너리 이름 | `gageyo-api` |
-| 도메인 | 비워 둠 (프런트엔드에서 API 프록시로 연결) |
-| 상태 확인 경로 | `/api/health` |
+| 도메인 | 비워 둠 (화면 앱이 `/api/` 로 프록시) |
+| 상태 확인 경로 | `/api/health` (DB 연결까지 확인) |
 
-Cargo workspace가 `backend/Cargo.toml`에 있고 실행 바이너리 이름은 `backend/crates/api/Cargo.toml`의 `gageyo-api`입니다. Rpanel이 Rust 바이너리를 빌드하고 실행합니다. 앱 포트는 Rpanel이 지정하므로 `PORT`를 별도로 고정하지 마세요. API는 그 포트의 `127.0.0.1`에서 수신합니다.
+**앱 폴더는 꼭 `backend`** 로 둡니다. 그래야 `Cargo.toml`(워크스페이스)·`crates/`·`modules/`·`migrations/` 가 함께 보입니다.
+`backend/crates/api` 만 지정하면 워크스페이스와 마이그레이션을 찾지 못합니다.
+포트는 Rpanel 이 정해 `PORT` 로 넣어 주고, API 는 `127.0.0.1:$PORT` 에서 듣습니다.
 
-**폴더 설정이 중요합니다.** 저장소 최상위 폴더가 아니라 `backend`를 앱 폴더로 지정해야 `Cargo.toml`과 `crates/`, `modules/`, `migrations/` 경로가 함께 보입니다. 빌드 기준은 `backend/Cargo.toml`의 workspace이며, 실행 패키지는 `gageyo-api`입니다. `backend/crates/api`만 앱 폴더로 지정하면 workspace 공용 모듈과 migration 경로를 찾지 못할 수 있습니다.
+## 4. MariaDB 와 환경 변수
 
-API 앱에는 패널이 주입하는 `PORT`와 MariaDB 연결 때 제공하는 `DATABASE_URL`을 사용합니다. 포트나 DB 주소를 코드·저장소에 직접 고정하지 마세요. 필요한 운영자 카테고리 관리를 위해 `ADMIN_API_KEY`도 API 앱 환경 변수에 별도로 등록합니다. 변수 값을 바꾼 뒤에는 해당 API 앱을 재시작하거나 다시 배포해야 새 프로세스에 적용됩니다.
+1. `gageyo-api` 앱 → **데이터베이스** 탭 → **MariaDB 데이터베이스 추가**(`gageyo_db`) → 이 앱에 연결 → `DATABASE_URL` 이 들어왔는지 확인
+2. **환경 변수** 탭에 [deploy/rpanel.env.example](../deploy/rpanel.env.example) 를 보고 넣습니다. 최소한:
 
-## 4. MariaDB 연결하기
+| 이름 | 값 |
+| --- | --- |
+| `ADMIN_EMAILS` | 운영자 이메일 (쉼표 구분) |
+| `DATA_KEY` | `openssl rand -hex 32` 로 만든 64자 — **한 번 정하면 바꾸지 않기** |
+| `APP_URL` · `PARTNER_URL` · `ADMIN_URL` | `https://app.gageyo.com` 등 (메일 링크용) |
+| `SMTP_URL` · `MAIL_FROM` · `OPS_EMAIL` | 메일 (권장. 없으면 메일 대신 로그) |
+| `TOSS_CLIENT_KEY` · `TOSS_SECRET_KEY` | 토스페이먼츠 (테스트 키로 먼저) |
 
-1. `gageyo-api` 앱의 **데이터베이스** 탭을 엽니다.
-2. **MariaDB 데이터베이스 추가**를 선택하고 데이터베이스를 만듭니다. 예: `gageyo_db`.
-3. 생성한 DB를 이 앱에 연결합니다.
-4. Rpanel이 앱에 `DATABASE_URL`을 주입하는지 앱 설정에서 확인합니다.
+전체 목록과 설명: [환경 변수](configuration.md). 값을 바꾼 뒤에는 API 앱을 다시 시작해야 적용됩니다.
 
-카테고리 관리 API를 사용하려면 같은 API 앱의 **환경 변수**에 `ADMIN_API_KEY`를 추가하세요. 값을 저장한 뒤 API 앱을 재시작 또는 재배포합니다. 키는 운영자가 직접 생성한 충분히 긴 임의 문자열로 설정하고 Git 저장소나 문서에 기록하지 마세요. 운영자 화면(`admin.gageyo.com`)의 **카테고리** 메뉴에서 동일한 키를 입력해 연결하면 카테고리 추가·수정·활성 상태 변경·삭제를 할 수 있습니다. 브라우저에는 현재 세션 동안만 보관됩니다. 키가 비어 있거나 API가 재시작되지 않으면 관리 API는 사용할 수 없습니다.
+- API 가 켜질 때 `backend/migrations/` 를 DB 에 적용합니다. 따로 SQL 을 실행할 필요가 없습니다.
+- **Redis 는 필요 없습니다.** 세션·가입 코드·요청 횟수 제한을 모두 MariaDB 로 처리합니다.
+- 업로드 이미지는 Rpanel 앱의 `data/uploads` 폴더(배포해도 남고 앱 백업에 포함)를 자동으로 찾아 씁니다.
+- Rpanel 의 DB 백업을 켠 뒤 운영을 시작하세요.
 
-API가 시작될 때 `backend/migrations/`의 SQL migration을 적용합니다. 별도 SQL 명령을 직접 실행할 필요는 없습니다. Rpanel의 DB 백업을 설정한 뒤 운영 배포를 진행하세요.
+## 5. 비공개 저장소 접근
 
-**Redis는 현재 gageyo API에서 사용하지 않습니다.** Rpanel에 Redis를 만들거나 연결할 필요가 없습니다. 이후 세션·캐시 기능을 구현할 때 별도로 붙입니다.
+앱의 **Git · 웹훅** 탭 → Deploy key 생성 → GitHub `gageyo` 저장소 **Settings → Deploy keys → Add deploy key** 에 붙여 넣기
+(**Allow write access 는 선택하지 않음**) → 저장소 주소가 SSH(`git@github.com:…`)인지 확인.
 
-### 애플리케이션 로그용 MongoDB
+## 6. 화면 앱 네 개
 
-로그 저장소는 MongoDB를 사용할 계획입니다. MongoDB 인스턴스를 준비한 뒤 API 앱 환경 변수에 연결 문자열 `MONGODB_URI`를 등록할 수 있도록 구성하세요. 단, 현재 Rust API의 `tracing` 로그는 표준 출력으로만 기록되며 MongoDB 저장 계층은 아직 연결되지 않았습니다. MongoDB에 실제 로그를 저장하려면 후속으로 API의 MongoDB 연결과 tracing 저장 계층 구현이 필요합니다. 기존 Rpanel 배포 로그도 함께 확인할 수 있도록 유지하세요.
+각각 **새 앱 → 프런트엔드 (웹 화면) → Static**, 같은 저장소·브랜치 `main`·프로젝트 `gageyo`·API 연결 `gageyo-api`.
 
-## 5. GitHub 비공개 저장소 접근 설정
+| 화면 | 앱 폴더 | 빌드 명령 | 출력 폴더 | 도메인 |
+| --- | --- | --- | --- | --- |
+| 고객 | `frontend` | `npm run build -w @gageyo/site` | `apps/site/dist` | `app.gageyo.com` |
+| 파트너 센터 | `frontend` | `npm run build -w @gageyo/console` | `apps/console/dist` | `partner.gageyo.com` |
+| 운영자 | `frontend` | `npm run build -w @gageyo/admin` | `apps/admin/dist` | `admin.gageyo.com` |
+| 소개 | `frontend` | `npm run build -w @gageyo/www` | `apps/www/dist` | `gageyo.com` |
 
-`gageyo`가 비공개 저장소라면 HTTPS URL 대신 SSH 주소를 사용합니다.
+**앱 폴더는 네 개 모두 `frontend`** 입니다 (npm 워크스페이스라 `packages/ui` 가 함께 필요). 출력 폴더는 `frontend` 기준 상대 경로입니다.
+Rpanel 은 `frontend/package.json` 기준으로 `npm install` 합니다.
 
-1. 앱의 **Git · 웹훅** 탭에서 Deploy key를 생성합니다.
-2. 표시된 공개 키를 복사합니다.
-3. GitHub의 `gageyo` 저장소에서 **Settings → Deploy keys → Add deploy key**를 엽니다.
-4. 공개 키를 붙여 넣고 **Allow write access는 선택하지 않은 상태**로 저장합니다. Rpanel은 코드를 읽고 배포하므로 저장소 쓰기 권한이 필요하지 않습니다.
-5. Rpanel의 **Git · 웹훅** 탭에서 저장소 URL이 SSH 주소인지 확인합니다.
+## 7. `/api` 연결과 https
 
-## 6. 프런트엔드 앱 네 개 등록하기
+1. 화면 앱마다 **API 연결**을 `gageyo-api`, 경로 `/api/` 로 둡니다. 화면은 같은 주소의 `/api` 를 부르므로 `VITE_API_URL` 은 필요 없습니다.
+2. 각 앱의 **SSL** 탭에서 인증서를 발급하고 https 를 켭니다. 로그인 쿠키에 `Secure` 가 붙으므로 **https 가 아니면 로그인이 되지 않습니다**.
+3. `https://app.gageyo.com/api/health` 가 `{"status":"ok"}` 인지 확인합니다.
 
-각 정적 앱은 같은 Git 저장소를 사용합니다. **새 앱 → 프런트엔드 (웹 화면) → Static**으로 만들고, 아래 표의 폴더·빌드 명령·출력 폴더·도메인을 각각 넣습니다.
+## 8. 첫 운영자 설정
 
-| 화면 | 화면 용도 | 앱 폴더 (Root Directory) | 빌드 명령 | 출력 폴더 | 도메인 예시 |
-|---|---|---|---|---|---|
-| 파트너 탐색·고객 서비스 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/site` | `apps/site/dist` | `app.gageyo.com` |
-| 업체 센터 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/console` | `apps/console/dist` | `partner.gageyo.com` |
-| 운영자 화면 | 관리자 화면 | `frontend` | `npm run build -w @gageyo/admin` | `apps/admin/dist` | `admin.gageyo.com` |
-| 마케팅 소개 | 사용자 화면 | `frontend` | `npm run build -w @gageyo/www` | `apps/www/dist` | `gageyo.com` |
+1. `https://admin.gageyo.com` → **비밀번호 설정 메일 받기** → `ADMIN_EMAILS` 에 넣은 이메일
+2. 메일의 링크(30분)로 비밀번호를 정합니다. 메일 설정이 없으면 API 앱 **로그**에 `reset=…` 링크가 찍힙니다.
+3. 로그인 → **내 보안**에서 OTP(2단계 인증)를 켭니다.
+4. **결제·운영 설정**에서 수수료율, 무통장 입금 계좌(선택), 고객센터·사업자 정보를 넣습니다.
 
-모든 정적 앱에서 다음 값도 동일하게 설정합니다.
+## 9. 배포와 자동 배포
 
-- Git 저장소: `git@github.com:sinji0117/gageyo.git`
-- 브랜치: `main`
-- Rpanel 프로젝트: 2단계에서 만든 `gageyo`
-- API 연결: 3단계의 `gageyo-api`
+첫 배포는 프로젝트 화면의 **전체 배포**(API 먼저, 이어서 화면)를 씁니다. push 때 자동 배포하려면 앱마다 **Git · 웹훅** 의
+URL·Secret 을 GitHub **Settings → Webhooks → Add webhook** 에 넣습니다 (`application/json`, push 이벤트만).
 
-Rpanel은 `frontend/package.json`을 기준으로 의존성을 설치합니다. 현재 `package-lock.json`은 저장소에 없으므로 Rpanel이 `npm install`을 사용합니다. 패키지 버전을 고정하는 lock 파일을 추가하면 다음 배포부터 재현 가능한 설치에 `npm ci`를 쓸 수 있습니다.
+## 이전 버전에서 올릴 때
 
-각 빌드 명령은 지정한 React workspace만 빌드하고, 출력 폴더는 `frontend` 기준 상대 경로입니다. 앱 폴더를 `frontend/apps/site`처럼 개별 앱 폴더로 지정하면 표의 명령과 출력 폴더가 맞지 않으므로 **앱 폴더는 네 앱 모두 `frontend`로 설정**하세요.
+- 새 마이그레이션(`20261024000001_platform.sql`)이 상태 열을 `ENUM` → `VARCHAR`, 좌표를 `DECIMAL` → `DOUBLE` 로 바꾸고 표를 추가합니다. 기존 데이터는 그대로입니다.
+- 예전 `ADMIN_API_KEY` 와 **파트너 키**는 계속 쓸 수 있습니다. 운영자 화면 업체 상세의 **비밀번호 설정 링크**로 업체를 계정 로그인으로 옮기세요.
+- 예전 고객 로그인 쿠키(`gageyo_session`)는 쓰지 않으므로 고객은 한 번 다시 로그인합니다.
+- `REDIS_URL`·`MONGODB_URI` 는 쓰지 않습니다. 넣어 두어도 무시합니다.
 
-## 7. `/api` 연결과 HTTPS 설정
+## 자주 보이는 증상
 
-1. Rpanel 프로젝트 화면에서 각 프런트엔드 앱의 **API 연결**을 `gageyo-api`로 설정합니다.
-2. 연결 경로는 `/api/`로 둡니다. 프런트엔드는 기본 API 주소 `/api`를 사용하므로 브라우저 요청이 같은 도메인에서 API 앱으로 전달됩니다.
-3. 각 앱의 **SSL** 탭에서 도메인 인증서를 발급하고 HTTPS를 켭니다.
-4. 고객 화면에서 업체 목록과 `/api/health` 응답을 확인합니다.
+| 증상 | 확인할 것 |
+| --- | --- |
+| `could not find Cargo.toml` · `failed to resolve workspace member` | API 앱 폴더가 `backend` 인지 |
+| 시작 로그에 `설정 오류: 환경변수 DATABASE_URL …` | MariaDB 를 API 앱에 연결했는지 |
+| `설정 오류: DATA_KEY 는 16진수 64자…` · `TOSS_… 키의 테스트/실제 종류가 다릅니다` | 환경 변수 값 형식 |
+| 마이그레이션 오류로 시작 안 됨 | 시작 로그의 SQL 오류. 이미 적용된 마이그레이션 파일을 고치면 체크섬 오류가 납니다 (고치지 말고 새 파일로) |
+| `/api/health` 가 503 `db_unavailable` | DB 가 꺼졌거나 연결 정보가 바뀜 |
+| 화면에서 API 502 | 화면 앱의 API 연결이 `gageyo-api`·`/api/` 인지, API 앱이 켜져 있는지 |
+| 로그인해도 바로 풀림 | https 인지 (`COOKIE_SECURE` 기본 true). 로컬 http 개발에서만 `COOKIE_SECURE=false` |
+| 운영자 로그인 401 | 이메일이 `ADMIN_EMAILS` 에 있는지, 바꾼 뒤 API 를 다시 시작했는지 |
+| 메일이 안 옴 | `SMTP_URL`·`MAIL_FROM` 둘 다 있는지, 시작 로그의 `메일:` 줄, 스팸함 |
+| 카드 결제 버튼이 없음 | `TOSS_CLIENT_KEY`·`TOSS_SECRET_KEY` 둘 다, 운영자 화면 결제·운영 설정의 상태 카드 |
+| 업로드 이미지가 배포 뒤 사라짐 | `UPLOAD_DIR` 이 릴리스 폴더 안이 아닌지 (기본은 앱 `data/uploads`) |
+| 화면이 404·빈 페이지 | 화면 앱 폴더가 `frontend`, 빌드 명령의 워크스페이스 이름·출력 폴더가 표와 같은지 |
 
-프런트엔드 앱은 API와 같은 origin으로 요청하므로 별도의 `VITE_API_URL` 환경 변수가 필요하지 않습니다. 로컬 Vite 개발 서버는 `frontend/apps/site/vite.config.js` 및 `frontend/apps/admin/vite.config.js`가 `/api`를 `127.0.0.1:8081`로 프록시합니다. 고객 화면의 카테고리는 API에서 활성 카테고리를 불러오며, 초기 항목은 DB migration에서 등록됩니다.
+## 참고
 
-운영자 API에서 승인된 업체의 **파트너 키 발급/재발급**을 누르면 키가 한 번 표시됩니다. 이 키를 해당 업체 담당자에게 안전한 채널로 전달하면 `partner.gageyo.com`에서 로그인할 수 있습니다. 키는 업체 하나에 연결되며 DB에는 해시로 저장됩니다. 재발급하면 이전 키는 즉시 무효화됩니다. 운영자 API를 사용하려면 백엔드 앱 환경변수에 `ADMIN_API_KEY`를 강한 임의 값으로 설정하고 운영자 화면에서 같은 값을 입력합니다.
-
-## 8. 배포와 자동 배포 웹훅
-
-첫 배포는 프로젝트 화면의 **전체 배포**를 사용하세요. 백엔드가 먼저 배포되고 연결된 프런트엔드가 이어서 빌드됩니다. 각 앱별 **배포 로그**에서 Cargo/npm 설치 및 빌드 오류를 확인할 수 있습니다.
-
-Git push 때 자동 배포하려면 앱별 **Git · 웹훅** 탭의 URL과 Secret을 사용해 GitHub 저장소의 **Settings → Webhooks → Add webhook**에 등록합니다.
-
-- Payload URL: Rpanel 앱에 표시된 Webhook URL
-- Content type: `application/json`
-- Secret: Rpanel 앱에 표시된 Secret
-- 이벤트: `Just the push event`
-
-웹훅을 받은 서버가 외부에서 접근 가능해야 합니다. 저장소 브랜치 `main`에 push한 뒤 앱의 배포 로그에서 새 커밋이 반영됐는지 확인합니다. 웹훅을 아직 등록하지 않았다면 프로젝트 화면에서 수동으로 전체 배포할 수 있습니다.
-
-### 백엔드 Cargo 빌드 오류 확인
-
-Cargo workspace manifest는 저장소 루트가 아니라 `backend/Cargo.toml`입니다. 이 파일의 `[workspace.dependencies]`에는 `tracing = "0.1"` 선언이 한 번만 있어야 합니다. API와 모듈은 각각의 `Cargo.toml`에서 `tracing.workspace = true`로 이 공용 선언을 참조합니다. 로그 포맷 설정용 `tracing-subscriber = { version = "0.3", features = ["env-filter"] }`는 다른 crate이므로 지우지 마세요.
-
-`duplicate key 'tracing'` 또는 `duplicate key` manifest 오류가 나오면 다음 순서로 처리합니다.
-
-1. GitHub `main` 브랜치에서 `backend/Cargo.toml`을 열어 `[workspace.dependencies]` 안의 중복 `tracing` 행을 확인합니다.
-2. `tracing = "0.1"` 하나만 남기고 저장합니다. 현재 저장소에서는 중복 선언을 제거한 상태입니다.
-3. 변경 파일 `backend/Cargo.toml`을 `main`에 커밋·푸시합니다. Rpanel은 배포 시작 시 브랜치의 최신 커밋을 가져오므로 배포 로그에서 해당 커밋 SHA를 확인하세요.
-4. Rpanel에서 `gageyo-api` 앱을 열고 **배포**를 눌러 백엔드부터 다시 배포합니다.
-5. 로그에 `Finished release` 또는 이에 해당하는 Cargo 성공 메시지가 나온 뒤 앱 상태와 `/api/health`를 확인합니다.
-
-Cargo가 여전히 중복 선언을 보고한다면 패널이 이전 커밋을 빌드했거나 다른 `Cargo.toml`을 기준으로 삼았을 수 있습니다. 배포 로그의 체크아웃 SHA와 앱 폴더(`backend`)를 먼저 확인한 후 다시 배포하세요. 매번 같은 오류가 나면 저장소 파일에서 `tracing =` 검색 결과가 workspace 선언 한 건인지, 빌드 로그가 그 최신 파일을 읽었는지 대조합니다.
-
-### 자주 보이는 배포 증상
-
-| 증상 | 확인할 항목 |
-|---|---|
-| `could not find Cargo.toml` | API 앱 폴더가 저장소 기준 `backend`인지 확인합니다. |
-| `failed to resolve workspace member` | `backend` 전체가 checkout됐는지, 개별 `crates/api`만 지정하지 않았는지 확인합니다. |
-| `DATABASE_URL` 누락 또는 DB 연결 오류 | MariaDB가 생성·연결됐는지, Rpanel이 API 앱에 DB 변수를 주입했는지 확인합니다. DB 암호를 문서나 빌드 명령에 넣지 마세요. |
-| 빌드는 성공했지만 API가 시작되지 않음 | API 앱의 실행 바이너리가 `gageyo-api`인지, `PORT`가 패널 할당 값인지, 시작 로그에 DB migration 오류가 없는지 확인합니다. |
-| 고객 페이지가 API에서 502를 받음 | 프런트엔드 앱의 API 연결 대상이 `gageyo-api`, 연결 경로가 `/api/`인지 확인하고 API 앱 상태를 먼저 확인합니다. |
-| 화면은 뜨지만 카테고리가 없음 | migration이 API 시작 로그에서 성공했는지, MariaDB가 같은 API 앱에 연결됐는지 확인합니다. |
-| 카테고리 관리자에서 401/503 | Rpanel API 환경 변수의 `ADMIN_API_KEY`가 저장됐는지 확인합니다. 키 변경 후 API를 재시작하고 운영자 화면에서 새 키로 다시 연결합니다. |
-| 프런트엔드 화면이 404 또는 빈 페이지 | 빌드 앱 폴더가 `frontend`, 빌드 명령의 workspace 이름과 출력 경로가 표와 일치하는지 확인합니다. |
-
-Rpanel 배포 로그, Rust 표준 출력, MongoDB 로그는 서로 다른 확인 지점입니다. MongoDB 저장 계층을 API에 연결하기 전에는 애플리케이션 로그가 MongoDB에 기록되지 않고 Rpanel 프로세스 로그에만 나타납니다.
-
-## 9. 운영 전에 필요한 구현
-
-현재 저장소는 DB migration과 초기 도메인 API 및 화면 뼈대를 갖춘 개발 단계입니다. 실제 공개 서비스로 운영하기 전 아래 기능을 구현하고 확인해야 합니다.
-
-- 회원가입·로그인·이메일 확인과 API 인증
-- 업체 계정 소유권 검사, 운영자 권한과 업체 승인 흐름
-- 고객 전화번호 등 개인정보 접근 통제, 보관·삭제 정책
-- 예약 중복 방지와 업체 영업 시간·휴무 관리
-- 실제 지도 SDK와 위치·거리 검색
-- 결제 승인·취소·환불과 웹훅 서명 검증
-- 주문 취소 시 재고 복구, 업체별 주문·배송 처리
-- 실데이터를 사용하는 업체·운영자 관리 화면
-- 제한된 CORS 원본, DB 백업 복원 점검, 오류 알림
-
-현재 API CORS는 개발 편의를 위해 모든 origin을 허용합니다. 같은 도메인 `/api` 프록시 배포만으로 CORS 정책이 제한되는 것은 아니므로, 운영 전 허용 도메인을 지정하도록 서버 설정을 개선해야 합니다.
-
-## 참고 문서
-
-- [Rpanel Git 자동 배포](https://github.com/sinji0117/Rpanel/blob/main/docs/git-deploy.md)
-- [Rpanel 데이터베이스 연결](https://github.com/sinji0117/Rpanel/blob/main/docs/database.md)
-- [gageyo API 설정 예시](../deploy/rpanel.env.example)
-- [gageyo 프로젝트 구조](architecture.md)
+- [Rpanel Git 자동 배포](https://github.com/sinji0117/Rpanel/blob/main/docs/git-deploy.md) · [Rpanel 데이터베이스](https://github.com/sinji0117/Rpanel/blob/main/docs/database.md)
+- [환경 변수](configuration.md) · [운영 안내](operations.md) · [구조](architecture.md)

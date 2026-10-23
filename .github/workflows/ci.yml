@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: API (단위 테스트 · 종단 검사)
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: gageyo_db
+          MARIADB_USER: gageyo_user
+          MARIADB_PASSWORD: devpass
+          MARIADB_ROOT_PASSWORD: rootpass
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DATABASE_URL: mysql://gageyo_user:devpass@127.0.0.1:3306/gageyo_db
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: cargo build
+        working-directory: backend
+        run: cargo build -p gageyo-api
+      - name: cargo test
+        working-directory: backend
+        run: cargo test
+      - name: 종단 검사
+        run: bash scripts/e2e.sh
+
+  frontend:
+    name: 화면 빌드 · 브라우저 점검
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: gageyo_db
+          MARIADB_USER: gageyo_user
+          MARIADB_PASSWORD: devpass
+          MARIADB_ROOT_PASSWORD: rootpass
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DATABASE_URL: mysql://gageyo_user:devpass@127.0.0.1:3306/gageyo_db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: npm install · build
+        working-directory: frontend
+        run: npm install --no-audit --no-fund && npm run build
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: API 빌드
+        working-directory: backend
+        run: cargo build -p gageyo-api
+      - name: 브라우저 점검
+        run: |
+          npm install --prefix /tmp/pw --no-audit --no-fund playwright-core@1.48.2
+          NODE_PATH=/tmp/pw/node_modules OUT=/tmp/ui-shots CHROME=$(which google-chrome) bash scripts/ui-smoke.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-screenshots
+          path: /tmp/ui-shots
+          if-no-files-found: ignore

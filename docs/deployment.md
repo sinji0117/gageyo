@@ -1,7 +1,34 @@
+[← 문서 목차](README.md)
+
 # 배포 구성
 
-Rpanel Git 자동 배포를 사용한다면 단계별 설정은 [Rpanel 배포 따라 하기](rpanel-setup.md)를 참고하세요.
+- **Rpanel**: [Rpanel 배포 따라 하기](rpanel-setup.md) — API 앱 1개 + 정적 화면 앱 4개, MariaDB 하나.
+- **다른 Linux 서버**
+  1. MariaDB 10.6 이상(utf8mb4)을 준비합니다.
+  2. `cd backend && cargo build --release -p gageyo-api` → `target/release/gageyo-api` 를 서비스로 띄웁니다
+     (환경 변수는 [환경 변수](configuration.md), 업로드 폴더 `UPLOAD_DIR` 은 배포해도 지워지지 않는 곳).
+  3. `cd frontend && npm install && npm run build` → `apps/{site,console,admin,www}/dist` 를 각 도메인의 정적 파일로 올립니다.
+  4. 각 도메인에서 `/api/` 를 API 로 프록시하고(`X-Real-IP` 헤더 전달), https 를 켭니다.
 
-다른 Linux 호스트에 배포할 때는 Rust API와 MariaDB를 먼저 준비하고, 프런트엔드 각 앱을 빌드해 정적 파일 호스트에 올립니다. 브라우저의 API 주소는 기본 `/api`이므로 같은 도메인의 `/api/`를 API 서버에 프록시해야 합니다. `VITE_API_URL`을 지정하면 이 기본 주소를 빌드 시 바꿀 수 있습니다.
+```nginx
+location /api/ {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    client_max_body_size 12m;   # 이미지 10MB + 여유
+}
+location / { try_files $uri /index.html; }
+```
 
-운영 전에는 인증·업체 권한 검사, 개인정보 접근 통제, 결제 승인과 웹훅 검증, 백업·복원, 제한된 CORS 원본을 구현하고 설정해야 합니다. 현재 코드는 초기 개발용 골격이며 실제 고객 데이터나 결제를 받는 환경에 바로 노출하지 마세요.
+## 운영 전에 확인할 것
+
+- [ ] https 와 `COOKIE_SECURE` 기본값(true)
+- [ ] `DATA_KEY` 설정 (바꾸지 않기), `ADMIN_EMAILS`, 운영자 OTP
+- [ ] 메일(`SMTP_URL`·`MAIL_FROM`) — 가입 인증·비밀번호 찾기·알림
+- [ ] 토스 테스트 키로 결제·취소 확인 → 가맹 계약 후 live 키 ([결제 안내](payments-toss.md))
+- [ ] 무통장 계좌·수수료율·고객센터·사업자 정보 (운영자 화면 결제·운영 설정)
+- [ ] DB 백업·복원 연습, 업로드 폴더 백업
+- [ ] 개인정보 처리방침·이용약관 문서 게시 (화면의 동의 문구와 맞추기)
+- [ ] `CORS_ORIGINS` 는 다른 도메인에서 API 를 부를 때만 설정 (기본은 CORS 헤더 없음 = 같은 주소만)
+
+자세한 순서: [첫 배포 체크리스트](first-deploy-checklist.md)
