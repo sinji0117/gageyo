@@ -1,0 +1,11 @@
+error: failed to load manifest for workspace member `/home/runner/work/gageyo/gageyo/backend/crates/api`
+referenced by workspace at `/home/runner/work/gageyo/gageyo/backend/Cargo.toml`
+
+Caused by:
+  failed to parse manifest at `/home/runner/work/gageyo/gageyo/backend/crates/api/Cargo.toml`
+
+Caused by:
+  error inheriting `redis` from workspace root manifest's `workspace.dependencies.redis`
+
+Caused by:
+  `dependency.redis` was not found in `workspace.dependencies`

@@ -1,3 +1,4 @@
+core test: 101
 cargo build: 101
 cargo test: 101
 frontend: 0
