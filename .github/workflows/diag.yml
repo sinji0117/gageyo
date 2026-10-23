@@ -8,15 +8,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: ["1.84", "1.86", "1.87"]
+        rust: ["1.82", "1.84", "1.86", "1.88", "1.90"]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with: { toolchain: "${{ matrix.rust }}" }
       - name: build
         working-directory: backend
+        env:
+          CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
         run: |
           cargo build --release --message-format=short 2>&1 | tee /tmp/b.log | tail -3
           v=$(rustc --version)
-          grep -E "error" /tmp/b.log | head -20 | while IFS= read -r l; do echo "::error::$v | $l"; done
+          sed "s/\x1b\[[0-9;]*m//g" /tmp/b.log | grep -E "^(error|src/|modules/|crates/)|error\[|Locking|Adding .* \(" | grep -v Downloaded | head -40 | while IFS= read -r l; do echo "::error::$v | $l"; done
           ! grep -q "^error" /tmp/b.log
