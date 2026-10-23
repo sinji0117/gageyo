@@ -140,3 +140,5 @@ main > header { position: sticky; top: 0; z-index: 10; height: 60px; display: fl
   .photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .welcome { flex-direction: column; align-items: flex-start; }
 }
+.aside-bottom > button { white-space: nowrap; flex-shrink: 0; }
+.aside-bottom > div:not(.avatar) { min-width: 0; flex: 1; }

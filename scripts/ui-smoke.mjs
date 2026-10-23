@@ -178,7 +178,7 @@ for (const [tab, label] of [
 }
 await step("운영자 업체 상세", async () => {
   await admin.locator("aside nav button", { hasText: "업체 관리" }).first().click();
-  await admin.getByRole("tab", { name: "승인" }).click();
+  await admin.getByRole("tab", { name: "승인", exact: true }).click();
   await admin.waitForTimeout(600);
   await admin.locator("tr.clickable").first().click();
   await admin.waitForSelector(".detail-actions", { timeout: 5000 });

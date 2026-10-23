@@ -2,7 +2,10 @@
 
 # 테스트
 
-GitHub Actions(`.github/workflows/ci.yml`)가 push·PR 마다 아래를 모두 돌립니다. MariaDB 는 서비스 컨테이너로 띄웁니다.
+GitHub Actions(`.github/workflows/ci.yml`)가 `main` push 와 PR 마다 아래를 모두 돌립니다. MariaDB 는 서비스 컨테이너로 띄웁니다.
+
+- **API**: `cargo build` → `cargo test` → 종단 검사
+- **화면**: `npm run build`(네 화면) → 화면 점검. 스크린샷은 실행 결과의 `ui-screenshots` 아티팩트로 내려받습니다.
 
 ## 단위 테스트
 

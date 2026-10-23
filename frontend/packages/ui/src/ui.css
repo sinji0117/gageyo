@@ -45,10 +45,13 @@ a { color: inherit; }
 .gy-field > span i { color: var(--bad); font-style: normal; }
 .gy-field small { font-weight: 500; color: var(--muted); font-size: 12px; }
 .gy-field input, .gy-field select, .gy-field textarea, .gy-input { width: 100%; padding: 10px 12px; border: 1px solid #dfe5df; border-radius: 8px; background: #fff; font-size: 14px; font-weight: 500; }
+.gy-field input[type="radio"], .gy-field input[type="checkbox"] { width: auto; padding: 0; border: 0; flex-shrink: 0; accent-color: #1b2a22; }
 .gy-field textarea { min-height: 88px; resize: vertical; }
-.gy-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gy-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: start; }
 .gy-inline { display: flex; gap: 8px; align-items: end; }
 .gy-inline > :first-child { flex: 1; }
+.gy-inline > input, .gy-inline > select { flex: 1 1 0; min-width: 0; }
+.gy-inline > .gy-button { flex: none; }
 .gy-form { display: grid; gap: 14px; }
 .gy-check { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
 

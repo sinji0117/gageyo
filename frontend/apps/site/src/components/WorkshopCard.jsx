@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@gageyo/ui";
 import { useApp } from "../context.js";
 
@@ -14,7 +14,20 @@ export function Stars({ value }) {
 
 /** 사진이 없으면 실제 업체처럼 보이는 사진 대신 이름 첫 글자로 된 그림을 씁니다. */
 export function Cover({ url, name, className = "shop-photo", children }) {
-  if (url) {
+  // 지워졌거나 열리지 않는 이미지는 빈 칸 대신 이름 그림으로
+  const [broken, setBroken] = useState(false);
+  useEffect(() => {
+    setBroken(false);
+    if (!url) return undefined;
+    let alive = true;
+    const img = new Image();
+    img.onerror = () => alive && setBroken(true);
+    img.src = url;
+    return () => {
+      alive = false;
+    };
+  }, [url]);
+  if (url && !broken) {
     return (
       <div className={className} style={{ backgroundImage: `url(${url})` }}>
         {children}
