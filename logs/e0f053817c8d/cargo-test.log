@@ -1,0 +1,102 @@
+   Compiling gageyo-api v0.2.0 (/home/runner/work/gageyo/gageyo/backend/crates/api)
+   Compiling gageyo-support v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/support)
+   Compiling gageyo-commerce v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/commerce)
+   Compiling gageyo-workshop v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/workshop)
+   Compiling gageyo-core v0.2.0 (/home/runner/work/gageyo/gageyo/backend/crates/core)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.53s
+     Running unittests src/main.rs (target/debug/deps/gageyo_api-4e46e1ea4fcd16e1)
+
+running 1 test
+test public::tests::escapes_xml ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/gageyo_commerce-eea1e0c66c023a44)
+
+running 6 tests
+test fulfillment::tests::item_transitions ... ok
+test orders::tests::payment_method_pick ... ok
+test products::tests::partner_status_rules ... ok
+test settlement::tests::periods ... ok
+test orders::tests::merges_and_limits ... ok
+test tests::order_status_from_items ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/gageyo_core-b0e426083b0588c9)
+
+running 32 tests
+test auth::tests::ip_headers ... ok
+test config::tests::bind_address_priority ... ok
+test auth::tests::cookies_and_tokens ... ok
+test config::tests::toss_key_pairs ... ok
+test config::tests::list_parsing ... ok
+test error::tests::status_codes ... ok
+test files::tests::image_url_rules ... ok
+test files::tests::rejects_non_images_and_svg ... ok
+test files::tests::rel_path_shape ... ok
+test config::tests::upload_dir_detects_rpanel_layout ... ok
+test mail::tests::bad_config_disables ... ok
+test mail::tests::masks_and_validates ... ok
+test mail::tests::redacts_password ... ok
+test ratelimit::tests::bucket_is_trimmed_to_key_length ... ok
+test schedule::tests::hours_and_parse ... ok
+test schedule::tests::closed_days_normalized ... ok
+test schedule::tests::visit_time_rules ... ok
+test secret::tests::roundtrip_and_plaintext ... ok
+test secret::tests::wrong_key_and_hash ... ok
+test toss::tests::transport_error_when_unreachable ... ok
+test totp::tests::base32_roundtrip_and_verify_window ... ok
+test totp::tests::rfc6238_vectors ... ok
+test util::tests::business_numbers ... ok
+test util::tests::carriers_and_fee ... ok
+test util::tests::geo_and_paging ... ok
+test util::tests::phones ... ok
+test util::tests::text_rules ... ok
+test verify::tests::codes ... ok
+test verify::tests::modes ... ok
+test toss::tests::confirm_and_cancel_against_mock ... ok
+test auth::tests::password_rules ... ok
+test files::tests::png_is_reencoded_and_resized ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.82s
+
+     Running unittests src/lib.rs (target/debug/deps/gageyo_support-8df719281bb38a6e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/gageyo_workshop-2ed444e01a3c882b)
+
+running 3 tests
+test bookings::tests::transitions ... ok
+test notify::tests::won_format ... ok
+test tests::mask_name ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests gageyo_commerce
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests gageyo_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests gageyo_support
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests gageyo_workshop
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

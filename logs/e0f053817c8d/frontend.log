@@ -1,5 +1,5 @@
 
-added 70 packages in 6s
+added 70 packages in 9s
 
 > build
 > npm run build --workspaces --if-present
@@ -10,25 +10,25 @@ added 70 packages in 6s
 
 [36mvite v7.3.7 [32mbuilding client environment for production...[36m[39m
 transforming...
-[32m✓[39m 30 modules transformed.
+[32m✓[39m 33 modules transformed.
 rendering chunks...
 computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-BHK4oL5Q.css  [39m[1m[2m  7.67 kB[22m[1m[22m[2m │ gzip:  2.05 kB[22m
-[2mdist/[22m[2massets/[22m[36mindex-B_ixNA-N.js   [39m[1m[2m239.19 kB[22m[1m[22m[2m │ gzip: 74.04 kB[22m
-[32m✓ built in 1.16s[39m
+[2mdist/[22m[2massets/[22m[36mindex-ButKd6Rb.js   [39m[1m[2m239.71 kB[22m[1m[22m[2m │ gzip: 74.24 kB[22m
+[32m✓ built in 1.23s[39m
 
 > @gageyo/console@0.1.0 build
 > vite build
 
 [36mvite v7.3.7 [32mbuilding client environment for production...[36m[39m
 transforming...
-[32m✓[39m 30 modules transformed.
+[32m✓[39m 33 modules transformed.
 rendering chunks...
 computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:  0.30 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-DWWx8bNG.css  [39m[1m[2m  5.11 kB[22m[1m[22m[2m │ gzip:  1.70 kB[22m
-[2mdist/[22m[2massets/[22m[36mindex-BIJjEDp7.js   [39m[1m[2m236.71 kB[22m[1m[22m[2m │ gzip: 73.50 kB[22m
+[2mdist/[22m[2massets/[22m[36mindex-BKJZBtar.js   [39m[1m[2m237.23 kB[22m[1m[22m[2m │ gzip: 73.69 kB[22m
 [32m✓ built in 1.17s[39m
 
 > @gageyo/site@0.1.0 build
@@ -36,13 +36,23 @@ computing gzip size...
 
 [36mvite v7.3.7 [32mbuilding client environment for production...[36m[39m
 transforming...
-[32m✓[39m 30 modules transformed.
-rendering chunks...
-computing gzip size...
-[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:  0.34 kB[22m
-[2mdist/[22m[2massets/[22m[35mindex-OT1scDhL.css  [39m[1m[2m  9.89 kB[22m[1m[22m[2m │ gzip:  2.89 kB[22m
-[2mdist/[22m[2massets/[22m[36mindex-CVG5bDqN.js   [39m[1m[2m239.61 kB[22m[1m[22m[2m │ gzip: 74.85 kB[22m
-[32m✓ built in 1.06s[39m
+[32m✓[39m 3 modules transformed.
+[31m✗[39m Build failed in 67ms
+[31merror during build:
+[31mCould not resolve "./index.css" from "src/main.jsx"[31m
+file: [36m/home/runner/work/gageyo/gageyo/frontend/apps/site/src/main.jsx[31m
+    at getRollupError (file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/parseAst.js:337:41)
+    at error (file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/parseAst.js:333:42)
+    at ModuleLoader.handleInvalidResolvedId (file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/node-entry.js:22841:24)
+    at file:///home/runner/work/gageyo/gageyo/frontend/node_modules/rollup/dist/es/shared/node-entry.js:22801:26[39m
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path /home/runner/work/gageyo/gageyo/frontend/apps/site
+npm error workspace @gageyo/site@0.1.0
+npm error location /home/runner/work/gageyo/gageyo/frontend/apps/site
+npm error command failed
+npm error command sh -c vite build
+
 
 > @gageyo/www@0.1.0 build
 > vite build
@@ -55,4 +65,4 @@ computing gzip size...
 [2mdist/[22m[32mindex.html                 [39m[1m[2m  0.39 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
 [2mdist/[22m[2massets/[22m[35mindex-_oWw1pAR.css  [39m[1m[2m  2.11 kB[22m[1m[22m[2m │ gzip:  0.98 kB[22m
 [2mdist/[22m[2massets/[22m[36mindex-Bbyen_6W.js   [39m[1m[2m224.46 kB[22m[1m[22m[2m │ gzip: 70.29 kB[22m
-[32m✓ built in 1.00s[39m
+[32m✓ built in 1.10s[39m
