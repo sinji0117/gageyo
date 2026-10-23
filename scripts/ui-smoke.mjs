@@ -3,7 +3,11 @@
 //
 // 환경 변수: OUT(스크린샷 폴더), CHROME(브라우저 실행 파일), CUSTOMER_EMAIL, PARTNER_EMAIL, PASSWORD, ADMIN_KEY, QUOTE_ID
 import { mkdirSync, writeFileSync } from "node:fs";
-import { chromium } from "playwright-core";
+import { createRequire } from "node:module";
+
+// ESM import 는 NODE_PATH 를 보지 않으므로 require 로 불러옵니다 (CI 는 /tmp 에 따로 설치).
+const require = createRequire(import.meta.url);
+const { chromium } = require("playwright-core");
 
 const OUT = process.env.OUT || "/tmp/ui-shots";
 const SITE = "http://127.0.0.1:4173";
