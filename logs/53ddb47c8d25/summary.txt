@@ -1,4 +1,4 @@
-core test: 101
+core test: 0
 cargo build: 101
 cargo test: 101
 frontend: 0

@@ -1,0 +1,71 @@
+ Downloading crates ...
+  Downloaded nu-ansi-term v0.50.3
+  Downloaded compression-core v0.4.34
+  Downloaded anyhow v1.0.104
+  Downloaded matchers v0.2.0
+  Downloaded compression-codecs v0.4.46
+  Downloaded async-compression v0.4.51
+  Downloaded thread_local v1.1.10
+  Downloaded aho-corasick v1.1.5
+  Downloaded sharded-slab v0.1.7
+  Downloaded regex-syntax v0.8.11
+  Downloaded tracing-log v0.2.0
+  Downloaded tokio-util v0.7.20
+  Downloaded regex-automata v0.4.18
+  Downloaded tracing-subscriber v0.3.23
+   Compiling log v0.4.34
+   Compiling futures-sink v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling futures-util v0.3.34
+   Compiling futures-channel v0.3.34
+   Compiling rustls v0.23.46
+   Compiling tracing v0.1.44
+   Compiling compression-core v0.4.34
+   Compiling compression-codecs v0.4.46
+   Compiling async-compression v0.4.51
+   Compiling tokio-util v0.7.20
+   Compiling axum-core v0.5.6
+   Compiling hyper-util v0.1.21
+   Compiling sqlx-core v0.8.6
+   Compiling tokio-rustls v0.26.6
+   Compiling tower v0.5.3
+   Compiling tower-http v0.6.11
+   Compiling hyper-rustls v0.27.10
+   Compiling sqlx-mysql v0.8.6
+   Compiling multer v3.1.0
+   Compiling axum v0.8.9
+   Compiling lettre v0.11.23
+   Compiling sqlx-macros-core v0.8.6
+   Compiling sqlx-macros v0.8.6
+   Compiling reqwest v0.12.28
+   Compiling sqlx v0.8.6
+   Compiling regex-syntax v0.8.11
+   Compiling anyhow v1.0.104
+   Compiling gageyo-core v0.2.0 (/home/runner/work/gageyo/gageyo/backend/crates/core)
+   Compiling tracing-log v0.2.0
+   Compiling regex-automata v0.4.18
+   Compiling sharded-slab v0.1.7
+   Compiling matchers v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling nu-ansi-term v0.50.3
+   Compiling tracing-subscriber v0.3.23
+   Compiling gageyo-commerce v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/commerce)
+error[E0432]: unresolved import `sha2`
+ --> modules/commerce/src/lib.rs:3:5
+  |
+3 | use sha2::{Digest, Sha256};
+  |     ^^^^ use of unresolved module or unlinked crate `sha2`
+  |
+  = help: if you wanted to use a crate named `sha2`, use `cargo add sha2` to add it to your `Cargo.toml`
+
+error[E0432]: unresolved import `uuid`
+ --> modules/commerce/src/lib.rs:5:5
+  |
+5 | use uuid::Uuid;
+  |     ^^^^ use of unresolved module or unlinked crate `uuid`
+  |
+  = help: if you wanted to use a crate named `uuid`, use `cargo add uuid` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `gageyo-commerce` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,23 @@
+   Compiling gageyo-commerce v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/commerce)
+   Compiling gageyo-workshop v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/workshop)
+   Compiling gageyo-support v0.2.0 (/home/runner/work/gageyo/gageyo/backend/modules/support)
+   Compiling anyhow v1.0.104
+error[E0432]: unresolved import `sha2`
+ --> modules/commerce/src/lib.rs:3:5
+  |
+3 | use sha2::{Digest, Sha256};
+  |     ^^^^ use of unresolved module or unlinked crate `sha2`
+  |
+  = help: if you wanted to use a crate named `sha2`, use `cargo add sha2` to add it to your `Cargo.toml`
+
+error[E0432]: unresolved import `uuid`
+ --> modules/commerce/src/lib.rs:5:5
+  |
+5 | use uuid::Uuid;
+  |     ^^^^ use of unresolved module or unlinked crate `uuid`
+  |
+  = help: if you wanted to use a crate named `uuid`, use `cargo add uuid` to add it to your `Cargo.toml`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `gageyo-commerce` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
